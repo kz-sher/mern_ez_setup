@@ -1,1 +1,2 @@
-# mern_ez_setup
+# Mern Ez Setup
+Just wanna make my life ezier

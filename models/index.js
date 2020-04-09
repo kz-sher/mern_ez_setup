@@ -1,4 +1,5 @@
-const User = require('./user.model');
-const TokenBlackList = require('./tokenblacklist.model');
+const User = require('./User');
+const TokenBlackList = require('./TokenBlackList');
+const ForgottenPassword = require('./ForgottenPassword');
 
-module.exports = { User, TokenBlackList }
+module.exports = { User, TokenBlackList, ForgottenPassword }

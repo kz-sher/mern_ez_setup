@@ -5,10 +5,10 @@ if (process.env.NODE_ENV !== 'production'){
 const express = require('express');
 const app = express();
 // const fs = require('fs');
+const cors = require('cors');
+const logger = require('morgan')
 const bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
-const morgan = require('morgan')
-const cors = require('cors');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const PORT = process.env.PORT;
@@ -33,7 +33,7 @@ connection.once('open', function() {
 // }
 
 app.use(cors());
-app.use(morgan('dev'));
+app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());

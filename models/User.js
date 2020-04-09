@@ -64,14 +64,14 @@ UserSchema.pre('save', function (next) {
     }
 });
 
-UserSchema.methods.comparePassword = function (plainPassword, cb) {
+UserSchema.methods.comparePassword = function(plainPassword, cb) {
     bcrypt.compare(plainPassword, this.password, function (err, isMatch) {
         if (err) return cb(err);
         cb(null, isMatch)
     })
 }
 
-UserSchema.statics.findByToken = function (token, cb) {
+UserSchema.statics.findByToken = function(token, cb) {
     const user = this;
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decode) {
         user.findOne({ _id: decoded.uid }, function (err, user) {

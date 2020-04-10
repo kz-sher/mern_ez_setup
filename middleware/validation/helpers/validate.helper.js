@@ -1,5 +1,5 @@
 const debug = require('debug')('validate');
-const Model = require('../../../models');
+const Model = require('@models');
 const { TokenBlackList } = Model;
 
 /******************************

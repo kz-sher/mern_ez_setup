@@ -3,7 +3,7 @@ const async = require('async');
 const moment = require('moment');
 const Schema = mongoose.Schema;
 const { isEmpty, isEqual } = require('lodash');
-const { generateTokenID } = require('../services/token.service');
+const { generateTokenID } = require('@services/token.service');
 
 const TokenBlackListSchema = new Schema({
     token: {

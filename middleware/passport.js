@@ -4,7 +4,7 @@ if (process.env.NODE_ENV !== 'production'){
 
 const JwtStrategy = require("passport-jwt").Strategy;
 const { fromAuthHeaderAsBearerToken } = require("passport-jwt").ExtractJwt;
-const { User } = require('../models');
+const { User } = require('@models');
 const passport = require('passport');
 
 async function authenticateUserByJwt(payload, done){

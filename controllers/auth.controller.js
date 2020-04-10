@@ -5,10 +5,10 @@ if (process.env.NODE_ENV !== 'production'){
 const jwt = require('jsonwebtoken');
 const async = require('async');
 const moment = require('moment');
-const { ErrorWithCode } = require('../utils/error.util');
-const { generateAccessToken, generateRefreshToken, generateUniqUserToken } = require('../services/token.service');
-const Mailer = require('../services/email.service');
-const { User } = require('../models');
+const { ErrorWithCode } = require('@utils/error.util');
+const { generateAccessToken, generateRefreshToken, generateUniqUserToken } = require('@services/token.service');
+const Mailer = require('@services/email.service');
+const { User } = require('@models');
 
 /**
  * Flow: Registration
@@ -53,7 +53,10 @@ const register = function (req, res) {
  * Any condition above that is not met will be responded with error message
  */
 const confirmEmail = (req, res) => {
-    const { uid, token } = req.params;
+    const { uid, token } = req.query;
+    if(!uid || !token){
+        return res.sendStatus(400);
+    }
     
     async.waterfall([
         function(done) {

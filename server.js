@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== 'production'){
     require('dotenv').config();
 }
 
+require('module-alias/register')
 const express = require('express');
 const app = express();
 // const fs = require('fs');
@@ -12,8 +13,8 @@ const cookieParser = require("cookie-parser");
 const mongoose = require('mongoose');
 const passport = require('passport');
 const PORT = process.env.PORT;
-const { AuthRouter } = require('./routes');
-const { initializePassport } = require('./middleware/passport');
+const { RedirectRouter, AuthRouter } = require('@routes');
+const { initializePassport } = require('@middleware/passport');
 
 // Create passport as authentication middleware
 initializePassport(passport);
@@ -39,6 +40,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 // app.use('/static', express.static('uploads'))
+app.use(RedirectRouter);
 app.use('/api/auth', AuthRouter);
 app.listen(PORT, function() {
     console.log("Server is running on Port: " + PORT);

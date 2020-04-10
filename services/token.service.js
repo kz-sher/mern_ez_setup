@@ -23,5 +23,14 @@ const generateTokenID = token => {
     return token.substring(0, num).concat(token.substring(token.length - num, token.length));
 }
 
+/**
+ * Generate unique token for user using secret composed of his old hashed password, user id & creation timestamp
+ */
+const generateUniqUserToken = ({ password, uid, type, timestamp, tokenLifetime }) => {
+    const secret = password + "-" + timestamp;
+    const token = jwt.sign({ uid, type }, secret, { expiresIn: tokenLifetime });
+    return token;
+}
 
-module.exports = { generateAccessToken, generateRefreshToken, generateTokenID }
+
+module.exports = { generateAccessToken, generateRefreshToken, generateTokenID, generateUniqUserToken }

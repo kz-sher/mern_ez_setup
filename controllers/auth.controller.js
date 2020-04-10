@@ -4,16 +4,17 @@ if (process.env.NODE_ENV !== 'production'){
 
 const jwt = require('jsonwebtoken');
 const async = require('async');
-const crypto = require('crypto');
+const moment = require('moment');
 const { ErrorWithCode } = require('../utils/error.util');
-const { generateAccessToken, generateRefreshToken } = require('../services/token.service');
+const { generateAccessToken, generateRefreshToken, generateUniqUserToken } = require('../services/token.service');
 const Mailer = require('../services/email.service');
-const { User, ForgottenPassword } = require('../models');
+const { User } = require('../models');
 
 /**
  * Flow: Registration
  * 1. Add new user
  * 2. Send email to notify user about successful registration
+ * Any condition above that is not met will be responded with error message
  */
 const register = function (req, res) {
     async.waterfall([
@@ -25,8 +26,17 @@ const register = function (req, res) {
         },
         function(user, done){
             res.status(200).json({ message: "Account created successfully" });
-            /* Send email */
-            done(null, 'done');
+
+            const token = generateUniqUserToken({
+                uid: user.uid,
+                password: user.password,
+                timestamp: user.created_at,
+                type: 'email_confirmation',
+                tokenLifetime: process.env.EMAIL_CONFIRMATION_TOKEN_LIFETIME,
+            });
+            Mailer.send.registerMail({ host: req.headers.host, user, token }, function(err, result){
+                done(err, result); 
+            });
         }
     ], function(err){
         if(err){
@@ -36,10 +46,50 @@ const register = function (req, res) {
 }
 
 /**
+ * Flow: Email Confirmation
+ * 1. Find user by id
+ * 2. Verify whether the token is valid based on current user data
+ * 3. Update user's email confirmation status
+ * Any condition above that is not met will be responded with error message
+ */
+const confirmEmail = (req, res) => {
+    const { uid, token } = req.params;
+    
+    async.waterfall([
+        function(done) {
+            User.findOne({ uid }, (err, user) => {
+                done(err, user);
+            });
+        },
+        function(user, done){
+            const secret = user.password + "-" + user.created_at;
+            jwt.verify(token, secret, (err, decoded) => {
+                done(err, { decoded, user });
+            });
+        },
+        function({ decoded, user }, done){
+            if(decoded.uid === user.uid && decoded.type === "email_confirmation"){ // Check if ids r same as well as type
+                user.is_email_confirmed = true;
+                user.save(err => done(err, user));
+            }
+            else{
+                done(true); // Invalid request;
+            }
+        }
+      ], function(err) {
+        if(err){
+            return res.sendStatus(400);
+        }
+        return res.sendStatus(200);
+      });
+}
+
+/**
  * Flow: Login
- * 1. Check if password given & hashed one in DB are the same
- * 2. Generate access & refresh token
- * 3. Send refresh token in cookie & access token in response
+ * 1. Check if email is confirmed
+ * 2. Check if password given & hashed one in DB are the same
+ * 3. Generate access & refresh token
+ * 4. Send refresh token in cookie & access token in response
  * Any condition above that is not met will be responded with error message
  * #IMPORTANT: 
  * - Set cookie as httpOnly (prevent XSS) and secure (HTTPS required)
@@ -49,6 +99,9 @@ const register = function (req, res) {
  */
 const login = (req, res) => {
     const user = req.user
+    if(!user.is_email_confirmed){
+        return res.status(401).json({ errors: 'Please confirm your email' });
+    }
 
     async.waterfall([
         function(done){
@@ -62,8 +115,8 @@ const login = (req, res) => {
             }); 
         },
         function(done){
-            const { accessToken, accessTokenExpiry } = generateAccessToken({ uid: user._id });
-            const { refreshToken, refreshTokenExpiry } = generateRefreshToken({ uid: user._id })
+            const { accessToken, accessTokenExpiry } = generateAccessToken({ uid: user.uid });
+            const { refreshToken, refreshTokenExpiry } = generateRefreshToken({ uid: user.uid })
             
             res.cookie("rf_tk", refreshToken, {
                 expires: new Date(refreshTokenExpiry),
@@ -106,100 +159,97 @@ const renewToken = (req, res) => {
     ],function(err){
         if(err){
             return res.sendStatus(400);
-            /* redirect login */
         } 
     });
 };
 
 /**
  * Flow: Forgotten Password
- * 1. Generate password reset token with random bytes
- * 2. Save the password reset token in DB
- * 3. Send email to user with the link (prepended with token)
- * Any condition above that is not met will be redirected to forgot password page
+ * 1. Generate password reset token unique to user
+ * 2. Send email to user with the link (prepended with user id and token)
+ * 3. Save user password reset timestamp into DB for limiting request use
+ * Any condition above that is not met will be responded with error message
  */
-
 const forgotPassword = (req, res) => {
     const user = req.user;
+    const token = generateUniqUserToken({
+        uid: user.uid,
+        password: user.password,
+        timestamp: user.created_at,
+        type: 'password_reset',
+        tokenLifetime: process.env.PASSWORD_RESET_TOKEN_LIFETIME,
+    });
 
     async.waterfall([
         function(done){
-            const byteSize = parseInt(process.env.PASSWORD_RESET_BYTESIZE);
-            crypto.randomBytes(byteSize, (err, buf) => {
-                const token = buf.toString('hex');
-                done(err, token)
-            });
+            const lastOneHour = moment(Date.now()).subtract(1, 'hour');
+            const userPwdResetReqTs = user.pwd_reset_req_at;
+            if( userPwdResetReqTs && userPwdResetReqTs > lastOneHour ){ // Limit password reset request
+                done(null, 'done');
+            }
+            else{
+                Mailer.send.forgottenPwdMail({ host: req.headers.host, user, token }, function(err, result){
+                    done(err, result); 
+                });
+            }
         },
-        function(token, done){
-            const forgottenPwdRecord = new ForgottenPassword({
-                token,
-                uid: user._id
-            });
-            forgottenPwdRecord.save(err => { done(err, token) }); // delete first and save new one
-        },
-        function(token, done) {
-            Mailer.send.forgottenPwdMail({
-                host: req.headers.host,
-                user,
-                token,
-            }, done);
+        function(_, done){
+            user.pwd_reset_req_at = Date.now();
+            user.save(err => done(err, 'done'));
         }
-    ], function(err) {
+    ],function(err){
         if (err) {
-            return res.status(400).json({ errors: err})
-            /* redirect to /forgotpwd */
-        }
-        return res.sendStatus(200);
-    });
-
-}
-
-const verifyResetToken = (req, res) => {
-    ForgottenPassword.findTokenByAlgo(req.params.token, (err, result) => {
-        if(err || !result) {
-            return res.sendStatus(400);
-            //   res.redirect('/forgotpwd');
+            return res.status(400).json({ errors: err })
         }
         return res.sendStatus(200);
     });
 }
 
+/**
+ * Flow: Reset Password
+ * 1. Find user by id
+ * 2. Verify whether the token is valid based on current user data
+ * 3. Update user with new password
+ * Any condition above that is not met will be responded with error message
+ */
 const resetPassword = (req, res) => {
+    const { uid, token } = req.params;
+    const newPassword = req.body.password;
+
     async.waterfall([
         function(done) {
-            ForgottenPassword.findTokenByAlgo(req.params.token, async (err, record) => {
-                // if no record found
-                if (!record) {
-                    return done(true);
-                    //   return res.redirect('back');
-                }
-
-                User.findById(record.uid, (err, user) => {
-                    done(err, { user, record });
-                });
-            });
-        },
-        function({ user, record }, done){
-            user.password = req.body.password;
-            user.save(err => {
-                done(err, { user, record });
-            });
-        },
-        function({ user, record }, done){
-            ForgottenPassword.findByIdAndDelete(record._id, (err, _) => {
+            User.findOne({ uid }, (err, user) => {
                 done(err, user);
             });
         },
-        function(user, done) {
-            Mailer.send.resetPwdDoneMail({ user }, done);
+        function(user, done){
+            const secret = user.password + "-" + user.created_at;
+            jwt.verify(token, secret, (err, decoded) => {
+                done(err, { decoded, user });
+            });
+        },
+        function({ decoded, user }, done){
+            if(decoded.uid === user.uid && decoded.type === "password_reset"){ // Check if ids r same as well as type
+                user.password = newPassword;
+                user.save(err => done(err, user));
+            }
+            else{
+                done(true); // Invalid request;
+            }
         }
       ], function(err) {
         if(err){
             return res.sendStatus(400);
-            // res.redirect('/');
         }
         return res.sendStatus(200);
       });
 }
 
-module.exports = { register, login, renewToken, forgotPassword, verifyResetToken, resetPassword }
+module.exports = { 
+    register, 
+    confirmEmail,
+    login, 
+    renewToken, 
+    forgotPassword, 
+    resetPassword 
+}

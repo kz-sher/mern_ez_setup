@@ -8,7 +8,7 @@ const { User } = require('../models');
 const passport = require('passport');
 
 async function authenticateUserByJwt(payload, done){
-    User.findOne({ _id: payload.id }).then((user, err) => {
+    User.findOne({ uid: payload.uid }).then((user, err) => {
         if(!isEmpty(user)) return done(null, user);
         if(isEmpty(user)) return done('404');
         if(err) return done(err);

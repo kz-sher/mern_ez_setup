@@ -12,10 +12,10 @@ const {
 } = require('../middleware/validation/validators');
 
 router.post('/register', RegisterValidator, AuthController.register);
+router.get('/email_confirmation/:uid/:token', AuthController.confirmEmail);
 router.post('/login', LoginValidator, AuthController.login);
 router.post('/token', RefreshTokenValidator, AuthController.renewToken);
 router.post('/forgotpwd', ForgotPwdValidator, AuthController.forgotPassword);
-router.get('/resetpwd/:token', AuthController.verifyResetToken);
-router.post('/resetpwd/:token', ResetPwdValidator, AuthController.resetPassword);
+router.post('/resetpwd/:uid/:token', ResetPwdValidator, AuthController.resetPassword);
 
 module.exports = router;

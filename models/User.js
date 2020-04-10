@@ -3,10 +3,16 @@ if (process.env.NODE_ENV !== 'production'){
 }
 
 const mongoose = require('mongoose');
+const autoIncrement = require('mongoose-auto-increment');
 const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
+    uid: {
+        type: Number,
+        index: true,
+        unique: true
+    },
     username: {
         type: String,
         required: true,
@@ -42,13 +48,27 @@ const UserSchema = new Schema({
         default: 'User',
     },
     created_at: {
-        type: Date,
+        type: Number,
         default: Date.now
     },
     updated_at: {
-        type: Date,
-        default: Date.now
+        type: Number,
     },
+    pwd_reset_req_at: {
+        type: Number,
+    },
+    is_email_confirmed: {
+        type: Boolean,
+        default: false
+    },
+});
+
+// initialize auto increment plugin based on connection
+autoIncrement.initialize(mongoose.connection); 
+UserSchema.plugin(autoIncrement.plugin, { 
+   model: 'User', 
+   field: 'uid',
+   startAt: 1
 });
 
 UserSchema.pre('save', function (next) {
@@ -64,17 +84,21 @@ UserSchema.pre('save', function (next) {
     }
 });
 
+UserSchema.methods.getFullname = function(){
+    return `${this.firstname} ${this.lastname}`;
+}
+
 UserSchema.methods.comparePassword = function(plainPassword, cb) {
     bcrypt.compare(plainPassword, this.password, function (err, isMatch) {
         if (err) return cb(err);
         cb(null, isMatch)
-    })
+    });
 }
 
 UserSchema.statics.findByToken = function(token, cb) {
     const user = this;
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decode) {
-        user.findOne({ _id: decoded.uid }, function (err, user) {
+        user.findOne({ uid: decoded.uid }, function (err, user) {
             if (err) return cb(err);
             cb(null, user);
         })

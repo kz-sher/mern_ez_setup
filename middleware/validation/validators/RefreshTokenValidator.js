@@ -1,7 +1,7 @@
 const { cookie } = require('express-validator');
 const { Validator } = require('./Validator');
-const { message } = require('../helpers/message.helper');
-const { isTokenBlacklisted } = require('../helpers/validate.helper');
+const { message } = require('@vhelpers/message.helper');
+const { isTokenBlacklisted } = require('@vhelpers/validate.helper');
 
 // Rule definition
 const validations = [

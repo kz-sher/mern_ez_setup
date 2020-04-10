@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator');
-const { capitalize } = require('../../../utils/general.util');
+const { capitalize } = require('@utils/general.util');
 
 /**
  * Format errors for response

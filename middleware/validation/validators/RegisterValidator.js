@@ -1,10 +1,10 @@
 const { check } = require('express-validator');
 const { Validator } = require('./Validator');
-const { message } = require('../helpers/message.helper');
-const { isMatchWith, isUnique } = require('../helpers/validate.helper');
-const passwordPolicyRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/;
-const alphaSpaceRegex = /^[A-Za-z\s]+$/;
-const genderOptions = ['Male', 'Female', 'Private'];
+const { message } = require('@vhelpers/message.helper');
+const { isMatchWith, isUnique } = require('@vhelpers/validate.helper');
+const PASSWORD_POLICY_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/;
+const ALPHA_SPACE_REGEX = /^[A-Za-z\s]+$/;
+const GENDER_OPTIONS = ['Male', 'Female', 'Private'];
 
 // Rule definition
 const validations = [
@@ -25,17 +25,17 @@ const validations = [
     check('firstname')
         .exists({ checkFalsy: true }).withMessage(message.required)
         .isString().withMessage(message.isString)
-        .matches(alphaSpaceRegex).withMessage(message.isAlphaSpace),
+        .matches(ALPHA_SPACE_REGEX).withMessage(message.isAlphaSpace),
 
     check('lastname')
         .exists({ checkFalsy: true }).withMessage(message.required)
         .isString().withMessage(message.isString)
-        .matches(alphaSpaceRegex).withMessage(message.isAlphaSpace),
+        .matches(ALPHA_SPACE_REGEX).withMessage(message.isAlphaSpace),
 
     check('password')
         .exists({ checkFalsy: true }).withMessage(message.required)
         .isString().withMessage(message.isString)
-        .matches(passwordPolicyRegex).withMessage(message.passwordStrength)
+        .matches(PASSWORD_POLICY_REGEX).withMessage(message.passwordStrength)
         .isLength({ min: 6 }).withMessage(message.min(6)),
 
     check('password_confirmation')
@@ -49,7 +49,7 @@ const validations = [
     check('gender')
         .exists({ checkFalsy: true }).withMessage(message.required)
         .isString().withMessage(message.isString)
-        .isIn(genderOptions).withMessage(message.isIn(genderOptions)),
+        .isIn(GENDER_OPTIONS).withMessage(message.isIn(GENDER_OPTIONS)),
 ]
 
 const RegisterValidator = Validator(validations);

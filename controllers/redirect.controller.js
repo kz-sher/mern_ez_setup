@@ -7,10 +7,8 @@
 const redirectWithParams = (prefix = '', postfix = '') => (req, res) => {
     var queryList = Object.entries(req.params).map(([key, value], i) => `${key}=${value}`);
     var queryString = '?' + queryList.join('&');
-
     var removeParamsFromUrl = (main, sub) => (sub.length > 0 && sub[0] != ':') ? (main + '/' + sub) : main
-    var orginalUrlWithoutParams = req.route.path.split('/').reduce(removeParamsFromUrl, '') 
-    
+    var orginalUrlWithoutParams = req.route.path.split('/').reduce(removeParamsFromUrl, '');
     var url = `${prefix}${orginalUrlWithoutParams}${postfix}${queryString}`;
     res.redirect(url);
 }

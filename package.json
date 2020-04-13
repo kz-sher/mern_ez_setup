@@ -44,6 +44,7 @@
     "@validation" : "middleware/validation",
     "@vvalidators" : "middleware/validation/validators",
     "@vhelpers" : "middleware/validation/helpers",
-    "@utils" : "utils"
+    "@utils" : "utils",
+    "@errors" : "errors"
   }
 }

@@ -4,7 +4,7 @@ const { message } = require('@vhelpers/message.helper');
 const { isMatchWith, isUnique } = require('@vhelpers/validate.helper');
 const PASSWORD_POLICY_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/;
 const ALPHA_SPACE_REGEX = /^[A-Za-z\s]+$/;
-const GENDER_OPTIONS = ['Male', 'Female', 'Private'];
+const GENDER_OPTIONS = ['Male', 'Female', 'Other'];
 
 // Rule definition
 const validations = [

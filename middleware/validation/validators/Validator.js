@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const { capitalize } = require('@utils/general.util');
+const { FormError } = require('@errors');
 
 /**
  * Format errors for response
@@ -28,8 +29,8 @@ const Validator = validations => async (req, res, next) => {
         return next();
     }
     
-    const formattedErrors = formatted(errors);    
-    res.status(422).json({ errors: formattedErrors });
+    const formattedErrors = formatted(errors);  
+    next(new FormError(formattedErrors));
 };
 
 module.exports = { Validator }

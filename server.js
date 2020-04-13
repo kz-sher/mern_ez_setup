@@ -14,13 +14,20 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const PORT = process.env.PORT;
 const { RedirectRouter, AuthRouter } = require('@routes');
+const { ErrorLogger } = require('@middleware/error_handler/ErrorLogger');
+const { GeneralErrorHandler } = require('@middleware/error_handler/GeneralErrorHandler');
 const { initializePassport } = require('@middleware/passport');
 
 // Create passport as authentication middleware
 initializePassport(passport);
 
 // Setup DB connection
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URI, { 
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useNewUrlParser: true,
+    useFindAndModify: false,
+});
 const connection = mongoose.connection;
 connection.once('open', function() {
     console.log("MongoDB database connection established successfully");
@@ -42,6 +49,8 @@ app.use(passport.initialize());
 // app.use('/static', express.static('uploads'))
 app.use(RedirectRouter);
 app.use('/api/auth', AuthRouter);
+app.use(ErrorLogger);
+app.use(GeneralErrorHandler);
 app.listen(PORT, function() {
     console.log("Server is running on Port: " + PORT);
 });

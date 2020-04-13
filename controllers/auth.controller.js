@@ -5,10 +5,11 @@ if (process.env.NODE_ENV !== 'production'){
 const jwt = require('jsonwebtoken');
 const async = require('async');
 const moment = require('moment');
-const { ErrorWithCode } = require('@utils/error.util');
+const { isEmpty } = require('lodash');
 const { generateAccessToken, generateRefreshToken, generateUniqUserToken } = require('@services/token.service');
 const Mailer = require('@services/email.service');
 const { User } = require('@models');
+const { BadReqError, UnAuthError } = require('@errors');
 
 /**
  * Flow: Registration
@@ -16,7 +17,7 @@ const { User } = require('@models');
  * 2. Send email to notify user about successful registration
  * Any condition above that is not met will be responded with error message
  */
-const register = function (req, res) {
+const register = function (req, res, next) {
     async.waterfall([
         function(done){
             const user = new User(req.body)
@@ -25,7 +26,7 @@ const register = function (req, res) {
             });
         },
         function(user, done){
-            res.status(200).json({ message: "Account created successfully" });
+            res.status(201).json({ message: "Account created successfully" });
 
             const token = generateUniqUserToken({
                 uid: user.uid,
@@ -35,13 +36,11 @@ const register = function (req, res) {
                 tokenLifetime: process.env.EMAIL_CONFIRMATION_TOKEN_LIFETIME,
             });
             Mailer.send.registerMail({ host: req.headers.host, user, token }, function(err, result){
-                done(err, result); 
+                done(err); 
             });
         }
     ], function(err){
-        if(err){
-            return res.status(400).json({ errors: err });
-        }
+        next(err);
     });
 }
 
@@ -49,18 +48,23 @@ const register = function (req, res) {
  * Flow: Email Confirmation
  * 1. Find user by id
  * 2. Verify whether the token is valid based on current user data
- * 3. Update user's email confirmation status
+ * 3. Check if user's email has already been confirmed
+ * 4. Update user's email confirmation status
  * Any condition above that is not met will be responded with error message
  */
 const confirmEmail = (req, res) => {
     const { uid, token } = req.query;
-    if(!uid || !token){
-        return res.sendStatus(400);
-    }
     
+    if(!uid || !token){
+        return next(new BadReqError('Invalid Request'));
+    }
+
     async.waterfall([
         function(done) {
             User.findOne({ uid }, (err, user) => {
+                if(isEmpty(user)){ // Check if user exists
+                    return done(new BadReqError('Invalid Request'));
+                }
                 done(err, user);
             });
         },
@@ -71,19 +75,28 @@ const confirmEmail = (req, res) => {
             });
         },
         function({ decoded, user }, done){
+            if(user.is_email_confirmed){ // Check if user's email has been verified
+                return done(null, 'email_confirmed_ad')
+            }
             if(decoded.uid === user.uid && decoded.type === "email_confirmation"){ // Check if ids r same as well as type
                 user.is_email_confirmed = true;
-                user.save(err => done(err, user));
+                user.save(err => done(err, 'email_confirmed'));
             }
             else{
-                done(true); // Invalid request;
+                done(BadReqError('Invalid Request')); // Invalid request;
             }
         }
-      ], function(err) {
+      ], function(err, result) {
         if(err){
-            return res.sendStatus(400);
+            res.redirect(`${process.env.BASE_URL || ''}/login?k=error`);
         }
-        return res.sendStatus(200);
+        else if(result === 'email_confirmed'){
+            res.redirect(`${process.env.BASE_URL || ''}/login?k=email_confirmed`);
+        }
+        else{
+            res.redirect(`${process.env.BASE_URL || ''}/login?k=email_confirmed_ad`);
+        }
+            
       });
 }
 
@@ -100,10 +113,10 @@ const confirmEmail = (req, res) => {
  * - Short lifetime for access token, longer lifetime for refresh token
  * - 2048 max byte size for access token, 1024 max byte size for refresh token
  */
-const login = (req, res) => {
+const login = (req, res, next) => {
     const user = req.user
     if(!user.is_email_confirmed){
-        return res.status(401).json({ errors: 'Please confirm your email' });
+        return next(new UnAuthError('Email confirmation is required'));
     }
 
     async.waterfall([
@@ -111,8 +124,7 @@ const login = (req, res) => {
             user.comparePassword(req.body.password, (err, isMatch) => {
                 // If passwords not matched
                 if (!isMatch){
-                    done(ErrorWithCode("Invalid credentials", 401));
-                    return;
+                    return done(new UnAuthError('Invalid credentials'));
                 }
                 done(err);
             }); 
@@ -132,10 +144,7 @@ const login = (req, res) => {
             done(null, 'done');
         }
     ], function(err) {
-        if(err){
-            const errorCode = err.status ? err.status : 400;
-            return res.status(errorCode).json({ errors: err.msg });
-        }
+        next(err);
     });
 }
 
@@ -145,7 +154,7 @@ const login = (req, res) => {
  * 2. Generate new access token set
  * Any condition above that is not met will be responded with error message
  */
-const renewToken = (req, res) => {
+const renewToken = (req, res, next) => {
     const refreshToken = req.cookies.rf_tk;
 
     async.waterfall([
@@ -160,9 +169,7 @@ const renewToken = (req, res) => {
             done(null, 'done');
         }
     ],function(err){
-        if(err){
-            return res.sendStatus(400);
-        } 
+        next(err);
     });
 };
 
@@ -173,7 +180,7 @@ const renewToken = (req, res) => {
  * 3. Save user password reset timestamp into DB for limiting request use
  * Any condition above that is not met will be responded with error message
  */
-const forgotPassword = (req, res) => {
+const forgotPassword = (req, res, next) => {
     const user = req.user;
     const token = generateUniqUserToken({
         uid: user.uid,
@@ -185,10 +192,10 @@ const forgotPassword = (req, res) => {
 
     async.waterfall([
         function(done){
-            const lastOneHour = moment(Date.now()).subtract(1, 'hour');
+            const lastOneHour = moment(Date.now()).subtract(1, 'hour').valueOf();
             const userPwdResetReqTs = user.pwd_reset_req_at;
             if( userPwdResetReqTs && userPwdResetReqTs > lastOneHour ){ // Limit password reset request
-                done(null, 'done');
+                done(null, false); // Send a false flag to skip next func
             }
             else{
                 Mailer.send.forgottenPwdMail({ host: req.headers.host, user, token }, function(err, result){
@@ -196,15 +203,18 @@ const forgotPassword = (req, res) => {
                 });
             }
         },
-        function(_, done){
+        function(result, done){
+            if(!result){
+                return done(); // skip updating pwd_reset_req_at
+            }
             user.pwd_reset_req_at = Date.now();
             user.save(err => done(err, 'done'));
         }
     ],function(err){
         if (err) {
-            return res.status(400).json({ errors: err })
+            return next(err);
         }
-        return res.sendStatus(200);
+        res.sendStatus(200);
     });
 }
 
@@ -215,13 +225,19 @@ const forgotPassword = (req, res) => {
  * 3. Update user with new password
  * Any condition above that is not met will be responded with error message
  */
-const resetPassword = (req, res) => {
+const resetPassword = (req, res, next) => {
     const { uid, token } = req.params;
     const newPassword = req.body.password;
+    if(!uid || !token){
+        return next(new BadReqError('Invalid Request'));
+    }
 
     async.waterfall([
         function(done) {
             User.findOne({ uid }, (err, user) => {
+                if(isEmpty(user)){ // Check if user exists
+                    return done(new BadReqError('Invalid Request'));
+                }
                 done(err, user);
             });
         },
@@ -234,17 +250,17 @@ const resetPassword = (req, res) => {
         function({ decoded, user }, done){
             if(decoded.uid === user.uid && decoded.type === "password_reset"){ // Check if ids r same as well as type
                 user.password = newPassword;
-                user.save(err => done(err, user));
+                user.save(err => done(err, 'done'));
             }
             else{
-                done(true); // Invalid request;
+                done(BadReqError('Invalid Request'));
             }
         }
       ], function(err) {
         if(err){
-            return res.sendStatus(400);
+            return next(err);
         }
-        return res.sendStatus(200);
+        res.sendStatus(200);
       });
 }
 

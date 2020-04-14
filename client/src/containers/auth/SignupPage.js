@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Grid, Header, Message } from 'semantic-ui-react'
 import { withFormik } from 'formik';
 import SignupForm from 'components/auth/SignupForm';
-import GeneralStatusMessage from 'containers/alert/GeneralStatusMessage';
+import GeneralFlashMessage from 'containers/alert/GeneralFlashMessage';
 import { signUp } from 'actions/auth.action';
 
 const styles = {
@@ -37,7 +37,7 @@ const SignupPage = ({
                 <Header as='h2' color='blue' textAlign='center'>
                     Sign-up for your account
                 </Header>
-                <GeneralStatusMessage />
+                <GeneralFlashMessage event='SIGNUP' />
                 <SignupForm
                     values={values}
                     errors={errors}

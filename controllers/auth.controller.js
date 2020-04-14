@@ -6,10 +6,29 @@ const jwt = require('jsonwebtoken');
 const async = require('async');
 const moment = require('moment');
 const { isEmpty } = require('lodash');
-const { generateAccessToken, generateRefreshToken, generateUniqUserToken } = require('@services/token.service');
-const Mailer = require('@services/email.service');
 const { User } = require('@models');
-const { BadReqError, UnAuthError } = require('@errors');
+const { 
+    BadReqError, 
+    UnAuthError, 
+    EmailError, 
+} = require('@errors');
+const Mailer = require('@services/email/email.service');
+const { 
+    generateAccessToken, 
+    generateRefreshToken, 
+    generateUniqUserToken, 
+    generateUUTSecret 
+} = require('@services/token.service');
+const { 
+    SIGNUP_SUCC,
+    EMAIL_CONF_SUCC,
+    FORGOTPWD_SUCC,
+    RESETPWD_SUCC,
+    SIGNUP_EMAIL_ERR,
+    FORGOTPWD_EMAIL_ERR,
+    EMAIL_MUST_CONF,
+    INV_CRE,
+} = require('@utils/message.util');
 
 /**
  * Flow: Registration
@@ -26,21 +45,27 @@ const register = function (req, res, next) {
             });
         },
         function(user, done){
-            res.status(201).json({ message: "Account created successfully" });
-
             const token = generateUniqUserToken({
-                uid: user.uid,
-                password: user.password,
+                onetimekey: user.is_email_confirmed,
+                payload: {
+                    uid: user.uid,
+                    type: 'email_confirmation',
+                },
                 timestamp: user.created_at,
-                type: 'email_confirmation',
                 tokenLifetime: process.env.EMAIL_CONFIRMATION_TOKEN_LIFETIME,
             });
             Mailer.send.registerMail({ host: req.headers.host, user, token }, function(err, result){
-                done(err); 
+                if(err){
+                    err = new EmailError(SIGNUP_EMAIL_ERR);
+                }
+                done(err);
             });
         }
     ], function(err){
-        next(err);
+        if(err){
+            return next(err);
+        }
+        res.status(201).json({ msg: SIGNUP_SUCC });
     });
 }
 
@@ -52,51 +77,38 @@ const register = function (req, res, next) {
  * 4. Update user's email confirmation status
  * Any condition above that is not met will be responded with error message
  */
-const confirmEmail = (req, res) => {
-    const { uid, token } = req.query;
-    
-    if(!uid || !token){
-        return next(new BadReqError('Invalid Request'));
-    }
+const confirmEmail = (req, res, next) => {
+    const { uid, token } = req.params;
 
     async.waterfall([
         function(done) {
             User.findOne({ uid }, (err, user) => {
                 if(isEmpty(user)){ // Check if user exists
-                    return done(new BadReqError('Invalid Request'));
+                    return done(new BadReqError());
                 }
                 done(err, user);
             });
         },
         function(user, done){
-            const secret = user.password + "-" + user.created_at;
+            const secret = generateUUTSecret(user.is_email_confirmed, user.created_at);
             jwt.verify(token, secret, (err, decoded) => {
                 done(err, { decoded, user });
             });
         },
         function({ decoded, user }, done){
-            if(user.is_email_confirmed){ // Check if user's email has been verified
-                return done(null, 'email_confirmed_ad')
-            }
             if(decoded.uid === user.uid && decoded.type === "email_confirmation"){ // Check if ids r same as well as type
                 user.is_email_confirmed = true;
                 user.save(err => done(err, 'email_confirmed'));
             }
             else{
-                done(BadReqError('Invalid Request')); // Invalid request;
+                done(new BadReqError()); // Invalid request;
             }
         }
-      ], function(err, result) {
+      ], function(err) {
         if(err){
-            res.redirect(`${process.env.BASE_URL || ''}/login?k=error`);
+            return next(err);
         }
-        else if(result === 'email_confirmed'){
-            res.redirect(`${process.env.BASE_URL || ''}/login?k=email_confirmed`);
-        }
-        else{
-            res.redirect(`${process.env.BASE_URL || ''}/login?k=email_confirmed_ad`);
-        }
-            
+        res.status(200).json({ msg: EMAIL_CONF_SUCC });
       });
 }
 
@@ -116,7 +128,7 @@ const confirmEmail = (req, res) => {
 const login = (req, res, next) => {
     const user = req.user
     if(!user.is_email_confirmed){
-        return next(new UnAuthError('Email confirmation is required'));
+        return next(new UnAuthError(EMAIL_MUST_CONF));
     }
 
     async.waterfall([
@@ -124,7 +136,7 @@ const login = (req, res, next) => {
             user.comparePassword(req.body.password, (err, isMatch) => {
                 // If passwords not matched
                 if (!isMatch){
-                    return done(new UnAuthError('Invalid credentials'));
+                    return done(new UnAuthError(INV_CRE));
                 }
                 done(err);
             }); 
@@ -183,10 +195,12 @@ const renewToken = (req, res, next) => {
 const forgotPassword = (req, res, next) => {
     const user = req.user;
     const token = generateUniqUserToken({
-        uid: user.uid,
-        password: user.password,
+        onetimekey: user.password,
+        payload:{
+            uid: user.uid,
+            type: 'password_reset',
+        },
         timestamp: user.created_at,
-        type: 'password_reset',
         tokenLifetime: process.env.PASSWORD_RESET_TOKEN_LIFETIME,
     });
 
@@ -199,6 +213,9 @@ const forgotPassword = (req, res, next) => {
             }
             else{
                 Mailer.send.forgottenPwdMail({ host: req.headers.host, user, token }, function(err, result){
+                    if(err){
+                        err = new EmailError(FORGOTPWD_EMAIL_ERR);
+                    }
                     done(err, result); 
                 });
             }
@@ -214,7 +231,7 @@ const forgotPassword = (req, res, next) => {
         if (err) {
             return next(err);
         }
-        res.sendStatus(200);
+        res.status(200).json({ msg: FORGOTPWD_SUCC });
     });
 }
 
@@ -228,21 +245,18 @@ const forgotPassword = (req, res, next) => {
 const resetPassword = (req, res, next) => {
     const { uid, token } = req.params;
     const newPassword = req.body.password;
-    if(!uid || !token){
-        return next(new BadReqError('Invalid Request'));
-    }
 
     async.waterfall([
         function(done) {
             User.findOne({ uid }, (err, user) => {
                 if(isEmpty(user)){ // Check if user exists
-                    return done(new BadReqError('Invalid Request'));
+                    return done(new BadReqError());
                 }
                 done(err, user);
             });
         },
         function(user, done){
-            const secret = user.password + "-" + user.created_at;
+            const secret = generateUUTSecret(user.password, user.created_at);
             jwt.verify(token, secret, (err, decoded) => {
                 done(err, { decoded, user });
             });
@@ -253,22 +267,22 @@ const resetPassword = (req, res, next) => {
                 user.save(err => done(err, 'done'));
             }
             else{
-                done(BadReqError('Invalid Request'));
+                done(new BadReqError());
             }
         }
       ], function(err) {
         if(err){
             return next(err);
         }
-        res.sendStatus(200);
+        res.status(200).json({ msg: RESETPWD_SUCC });
       });
 }
 
 module.exports = { 
-    register, 
+    register,
     confirmEmail,
-    login, 
-    renewToken, 
-    forgotPassword, 
-    resetPassword 
+    login,
+    renewToken,
+    forgotPassword,
+    resetPassword, 
 }

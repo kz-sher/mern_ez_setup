@@ -2,9 +2,13 @@ const debug = require('debug')('validate');
 const Model = require('@models');
 const { TokenBlackList } = Model;
 
-/******************************
- * Custom validation function *
- *****************************/
+/*********************************************
+ * Custom validation function, regex & others*
+ ********************************************/
+
+const PWD_POLICY_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/;
+const ALPHA_SPACE_REGEX = /^[A-Za-z\s]+$/;
+const GENDER_OPTIONS = ['Male', 'Female', 'Other'];
 
 /**
  * Check whether the value in current field matches with the one in given field
@@ -73,4 +77,12 @@ const isTokenBlacklisted = value => {
             });
 }
 
-module.exports = { isMatchWith, isUnique, isExist, isTokenBlacklisted }
+module.exports = { 
+    PWD_POLICY_REGEX,
+    ALPHA_SPACE_REGEX,
+    GENDER_OPTIONS,
+    isMatchWith, 
+    isUnique, 
+    isExist, 
+    isTokenBlacklisted 
+}

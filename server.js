@@ -47,7 +47,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 // app.use('/static', express.static('uploads'))
-app.use(RedirectRouter);
+// app.use(RedirectRouter);
 app.use('/api/auth', AuthRouter);
 app.use(ErrorLogger);
 app.use(GeneralErrorHandler);

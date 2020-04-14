@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Grid, Header, Message } from 'semantic-ui-react'
 import { withFormik } from 'formik'
 import LoginForm from 'components/auth/LoginForm';
-import LoginStatusMessage from 'containers/alert/LoginStatusMessage';
+import GeneralFlashMessage from 'containers/alert/GeneralFlashMessage';
 import { login } from 'actions/auth.action';
 
 const styles = {
@@ -20,6 +20,7 @@ const styles = {
 
 const LoginPage = ({
     errors,
+    touched,
     isSubmitting,
     handleSubmit,
 }) =>{
@@ -29,7 +30,7 @@ const LoginPage = ({
                 <Header as='h2' color='blue' textAlign='center'>
                     Log-in to your account
                 </Header>
-                <LoginStatusMessage />
+                <GeneralFlashMessage event='LOGIN' />
                 <LoginForm errors={errors} isSubmitting={isSubmitting} handleSubmit={handleSubmit} />
                 <Message>
                     New to us? &nbsp; <Link to='signup'>Sign Up</Link>
@@ -51,7 +52,7 @@ const LoginFormik = withFormik({
     },
     handleSubmit: (values, { props, setErrors, setSubmitting }) => {
         const { login } = props;
-        login({ userData: values, setErrors, setSubmitting});
+        login({ userData: values, setErrors, setSubmitting });
     }
 });
 

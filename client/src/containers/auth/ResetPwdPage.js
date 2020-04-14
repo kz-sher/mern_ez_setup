@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Grid, Header } from 'semantic-ui-react'
 import { withFormik } from 'formik'
 import ResetPwdForm from 'components/auth/ResetPwdForm';
-import GeneralStatusMessage from 'containers/alert/GeneralStatusMessage';
+import GeneralFlashMessage from 'containers/alert/GeneralFlashMessage';
 import { resetPwd } from 'actions/auth.action';
 
 const styles = {
@@ -28,7 +28,7 @@ const ResetPwdPage = ({
                 <Header as='h2' color='blue' textAlign='center'>
                     Reset your password
                 </Header>
-                <GeneralStatusMessage />
+                <GeneralFlashMessage event='RESETPWD' />
                 <ResetPwdForm errors={errors} isSubmitting={isSubmitting} handleSubmit={handleSubmit} />
             </Grid.Column>
         </Grid>

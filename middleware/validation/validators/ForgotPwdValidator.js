@@ -1,16 +1,16 @@
 const { check } = require('express-validator');
 const { Validator } = require('./Validator');
-const { message } = require('@vhelpers/message.helper');
 const { isExist } = require('@vhelpers/validate.helper');
+const { REQUIRED, INV_FORMAT, EXISTS } = require('@utils/message.util');
 
 // Rule definition
 const validations = [
     check('email')
-        .exists({ checkFalsy: true }).withMessage(message.required)
+        .exists({ checkFalsy: true }).withMessage(REQUIRED)
         .bail()
-        .isEmail().withMessage(message.invalidFormat)
+        .isEmail().withMessage(INV_FORMAT)
         .bail()
-        .custom(isExist({ table: 'User', column: 'email' })).withMessage(message.exists),
+        .custom(isExist({ table: 'User', column: 'email' })).withMessage(EXISTS),
 ]
 
 const ForgotPwdValidator = Validator(validations);

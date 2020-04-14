@@ -24,13 +24,25 @@ const generateTokenID = token => {
 }
 
 /**
- * Generate unique token for user using secret composed of his old hashed password, user id & creation timestamp
+ * Generate unique token for user using secret 
+ * It includes soon-to-change user field value (e.g. password, flag), uid & created_at
+ * one time key = a value that invalidates the token once it gt changed
  */
-const generateUniqUserToken = ({ password, uid, type, timestamp, tokenLifetime }) => {
-    const secret = password + "-" + timestamp;
-    const token = jwt.sign({ uid, type }, secret, { expiresIn: tokenLifetime });
+const generateUniqUserToken = ({ onetimekey, payload, timestamp, tokenLifetime }) => {
+    const secret = generateUUTSecret(onetimekey, timestamp);
+    const token = jwt.sign(payload, secret, { expiresIn: tokenLifetime });
     return token;
 }
 
+const generateUUTSecret = (onetimekey, timestamp) => {
+    return [onetimekey, timestamp, process.env.RANDOM_TOKEN_SECRET].join('-');
+}
 
-module.exports = { generateAccessToken, generateRefreshToken, generateTokenID, generateUniqUserToken }
+
+module.exports = { 
+    generateAccessToken, 
+    generateRefreshToken, 
+    generateTokenID, 
+    generateUniqUserToken,
+    generateUUTSecret
+}

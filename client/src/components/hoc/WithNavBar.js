@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Sidebar } from 'semantic-ui-react';
-import SideNavBar from '../layout/SideNavBar';
-import MainNavBar from '../layout/MainNavBar';
+import MainSideBar from 'containers/layout/MainSideBar';
+import MainNavBar from 'containers/layout/MainNavBar';
 
 const styles = {
     pushable: {
@@ -30,7 +30,7 @@ const WithNavBar = (OriginalComponent) => {
             const { sidebarOpened } = this.state;
             return (
                 <Sidebar.Pushable style={styles.pushable}>
-                    <SideNavBar handleSidebarClose={this.handleSidebarClose} sidebarOpened={sidebarOpened}/>
+                    <MainSideBar handleSidebarClose={this.handleSidebarClose} sidebarOpened={sidebarOpened}/>
                     <Sidebar.Pusher dimmed={sidebarOpened} style={styles.pusher}>
                         <MainNavBar handleSidebarOpen={this.handleSidebarOpen} />
                         <OriginalComponent {...this.props} />

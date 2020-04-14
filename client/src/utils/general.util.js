@@ -14,5 +14,18 @@ export const extractLocation = () => {
     const search = window.location.search;
     const query = qs.parse(search, { ignoreQueryPrefix: true });
     return { pathname, query }
+}
 
+export const translateErrorToMsg = data => {
+    if(data){
+        if(data instanceof Object){
+            return data;
+        }
+        else{
+            return { header: data }
+        }
+    }
+    else{
+        return { header: '[E999] Error Occured' };
+    }
 }

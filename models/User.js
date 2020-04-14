@@ -47,6 +47,10 @@ const UserSchema = new Schema({
         type: String,
         default: 'User',
     },
+    is_email_confirmed: {
+        type: Boolean,
+        default: false
+    },
     created_at: {
         type: Number,
         default: Date.now
@@ -57,10 +61,9 @@ const UserSchema = new Schema({
     pwd_reset_req_at: {
         type: Number,
     },
-    is_email_confirmed: {
-        type: Boolean,
-        default: false
-    },
+    deleted_at: {
+        type: Number,
+    }
 });
 
 // initialize auto increment plugin based on connection

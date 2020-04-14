@@ -1,16 +1,16 @@
 import axios from 'axios';
 import { setAuthHeader } from 'utils/auth.util.js';
-import { REGISTRATION_SUCCESS, FORGOT_PWD_SUCCESS, RESET_PWD_SUCCESS } from 'utils/messages.js';
-import { showStatusMsg, hideStatusMsg } from 'actions/alert.action';
-import { pushHistory } from 'actions/global.action';
+import { translateErrorToMsg } from 'utils/general.util.js'
+import EventEmitter from 'utils/EventEmitter';
+import history from 'utils/history';
+import { SIGN_IN, SIGN_OUT } from './types';
 
 export const signUp = ({ userData, setErrors, setSubmitting, resetForm }) => {
     return dispatch => {
-        dispatch(hideStatusMsg());
         axios.post('/api/auth/register', userData).then(
-            () => {
-                const {header, content } = REGISTRATION_SUCCESS;
-                dispatch(showStatusMsg({ status: 'success', msg: { header, content } }));
+            ({ data: { msg } }) => {
+                console.log(msg)
+                EventEmitter.emit('SIGNUP', { status: 'success', msg });
                 resetForm();
                 setSubmitting(false);
             },
@@ -19,8 +19,8 @@ export const signUp = ({ userData, setErrors, setSubmitting, resetForm }) => {
                     setErrors(data);
                 }
                 else{
-                    const err = data? data: 'Internal Server Error';
-                    dispatch(showStatusMsg({ status: 'error', msg: { header: err } }));
+                    const err = translateErrorToMsg(data);
+                    EventEmitter.emit('SIGNUP', { status: 'error', msg: err });
                 }
                 setSubmitting(false);
             }
@@ -30,20 +30,19 @@ export const signUp = ({ userData, setErrors, setSubmitting, resetForm }) => {
 
 export const login = ({ userData, setErrors, setSubmitting }) => {
     return dispatch => {
-        dispatch(hideStatusMsg());
         axios.post('/api/auth/login', userData).then(
-            ({ data }) => {
-                const { accessToken } = data;
+            ({ data: { accessToken } }) => {
                 setAuthHeader(accessToken);
-                dispatch(pushHistory('/dashboard'));
+                dispatch(signIn(accessToken));
+                history.push('/dashboard');;
             },
             ({ response: { data, status } }) => {
                 if(status === 422){ // Set form error if exists
                     setErrors(data);
                 }
                 else{
-                    const err = data? data: 'Internal Server Error';
-                    dispatch(showStatusMsg({ status: 'error', msg: { header: err } }));
+                    const err = translateErrorToMsg(data);
+                    EventEmitter.emit('LOGIN', { status: 'error', msg: err });
                 }
                 setSubmitting(false);
             }
@@ -53,11 +52,9 @@ export const login = ({ userData, setErrors, setSubmitting }) => {
 
 export const forgotPwd = ({ userData, setErrors, setSubmitting, resetForm }) => {
     return dispatch => {
-        dispatch(hideStatusMsg());
         axios.post('/api/auth/forgotpwd', userData).then(
-            () => {
-                const { header, content } = FORGOT_PWD_SUCCESS;
-                dispatch(showStatusMsg({ status: 'success', msg: { header, content } }));
+            ({ data: { msg } }) => {
+                EventEmitter.emit('FORGOTPWD', { status: 'success', msg });
                 resetForm();
                 setSubmitting(false);
             },
@@ -66,8 +63,8 @@ export const forgotPwd = ({ userData, setErrors, setSubmitting, resetForm }) => 
                     setErrors(data);
                 }
                 else{
-                    const err = data? data: 'Internal Server Error';
-                    dispatch(showStatusMsg({ status: 'error', msg: { header: err } }));
+                    const err = translateErrorToMsg(data);
+                    EventEmitter.emit('FORGOTPWD', { status: 'error', msg: err });
                 }
                 setSubmitting(false);
             }
@@ -76,28 +73,59 @@ export const forgotPwd = ({ userData, setErrors, setSubmitting, resetForm }) => 
 }
 
 export const resetPwd = ({ userData, params, setErrors, setSubmitting }) => {
-    return (dispatch) => {
+    return dispatch => {
         
         const { uid, token } = params;
 
-        dispatch(hideStatusMsg());
         axios.post(`/api/auth/resetPwd/${uid}/${token}`, userData).then(
-            () => {
-                const { header, content } = RESET_PWD_SUCCESS;
-                dispatch(pushHistory('/login'));
-                dispatch(showStatusMsg({ status: 'success', msg: { header, content } }));
+            ({ data: { msg } }) => {
+                history.push('/login');
+                EventEmitter.emit('LOGIN', { status: 'success', msg });
             },
             ({ response: { data, status } }) => {
                 if(status === 422){ // Set form error if exists
                     setErrors(data);
+                    setSubmitting(false);
                 }
                 else{
-                    const err = data? data: 'Internal Server Error';
-                    dispatch(pushHistory('/login'));
-                    dispatch(showStatusMsg({ status: 'error', msg: { header: err } }));
+                    const err = translateErrorToMsg(data);
+                    history.push('/login');
+                    EventEmitter.emit('LOGIN', { status: 'error', msg: err });
                 }
-                setSubmitting(false);
             }
         );
+    }
+}
+
+export const confirmEmail = (uid, token) => {
+    return dispatch => {
+        axios.post(`/api/auth/email_confirmation/${uid}/${token}`).then(
+            ({ data: { msg } }) => {
+                history.push('/login');
+                EventEmitter.emit('LOGIN', { status: 'success', msg });
+            },
+            ({ response: { data } }) => {
+                const err = translateErrorToMsg(data);
+                history.push('/login');
+                EventEmitter.emit('LOGIN', { status: 'error', msg: err });
+            },
+        );
+    }
+}
+
+export const signIn = token => {
+    return dispatch => {
+        dispatch({
+            type: SIGN_IN,
+            token
+        })
+    }
+}
+
+export const signOut = () => {
+    return dispatch => {
+        dispatch({
+            type: SIGN_OUT,
+        })
     }
 }

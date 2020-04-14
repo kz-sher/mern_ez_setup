@@ -1,20 +1,25 @@
 const { check } = require('express-validator');
 const { Validator } = require('./Validator');
-const { message } = require('@vhelpers/message.helper');
-const { isMatchWith } = require('@vhelpers/validate.helper');
-const PASSWORD_POLICY_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/;
+const { PWD_POLICY_REGEX, isMatchWith } = require('@vhelpers/validate.helper');
+const { 
+    REQUIRED,  
+    IS_STRING,
+    STRONG_PWD,
+    MIN,
+    SHUD_MATCH_WITH
+} = require('@utils/message.util');
 
 // Rule definition
 const validations = [
     check('password')
-        .exists({ checkFalsy: true }).withMessage(message.required)
-        .isString().withMessage(message.isString)
-        .matches(PASSWORD_POLICY_REGEX).withMessage(message.passwordStrength)
-        .isLength({ min: 6 }).withMessage(message.min(6)),
+        .exists({ checkFalsy: true }).withMessage(REQUIRED)
+        .isString().withMessage(IS_STRING)
+        .matches(PWD_POLICY_REGEX).withMessage(STRONG_PWD)
+        .isLength({ min: 6 }).withMessage(MIN(6)),
 
     check('password_confirmation')
-        .exists({ checkFalsy: true }).withMessage(message.required)
-        .custom(isMatchWith('password')).withMessage(message.isMatch('Password')),
+        .exists({ checkFalsy: true }).withMessage(REQUIRED)
+        .custom(isMatchWith('password')).withMessage(SHUD_MATCH_WITH('Password')),
 ]
 
 const ResetPwdValidator = Validator(validations);

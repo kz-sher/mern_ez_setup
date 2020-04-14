@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Grid, Header } from 'semantic-ui-react'
 import { withFormik } from 'formik'
 import ForgotPwdForm from 'components/auth/ForgotPwdForm';
-import GeneralStatusMessage from 'containers/alert/GeneralStatusMessage';
+import GeneralFlashMessage from 'containers/alert/GeneralFlashMessage';
 import { forgotPwd } from 'actions/auth.action';
 
 const styles = {
@@ -28,7 +28,7 @@ const ForgotPwdPage = ({
                 <Header as='h2' color='blue' textAlign='center'>
                     Forgot password
                 </Header>
-                <GeneralStatusMessage />
+                <GeneralFlashMessage event='FORGOTPWD' />
                 <ForgotPwdForm errors={errors} isSubmitting={isSubmitting} handleSubmit={handleSubmit} />
             </Grid.Column>
         </Grid>

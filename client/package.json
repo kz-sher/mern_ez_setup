@@ -51,5 +51,6 @@
   },
   "devDependencies": {
     "redux-devtools-extension": "^2.13.8"
-  }
+  },
+  "cracoConfig": "src/config/craco.config.js"
 }

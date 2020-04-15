@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Router, Switch, Route } from 'react-router';
-import { Loader } from 'semantic-ui-react';
 import OnlyIf from './components/utils/OnlyIf';
 import UserRoute from './containers/route/UserRoute';
 import GuestRoute from './containers/route/GuestRoute';
@@ -32,9 +31,6 @@ const App = ({ isUserInitialized }) => {
             <UserRoute exact path='/products' component={ProductPage} />
             <GuestRoute component={NotFound} />
           </Switch>
-        </OnlyIf>
-        <OnlyIf condition={!isUserInitialized}>
-          <Loader />
         </OnlyIf>
       </Router>
   );

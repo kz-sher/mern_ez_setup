@@ -121,28 +121,22 @@ export const initUserState = () => {
                 dispatch(signIn(accessToken));
                 dispatch(initDone());
             },
-            ({ response: { data } }) => {
-                const err = translateErrorToMsg(data);
-                console.log(err);
-                dispatch(initDone());
-            },
+            () => { dispatch(initDone()) },
         );
     }
 }
 
 export const signIn = token => {
     return dispatch => {
-        dispatch({
-            type: SIGN_IN,
-            token
-        })
+        dispatch({ type: SIGN_IN, token })
     }
 }
 
 export const signOut = () => {
     return dispatch => {
-        dispatch({
-            type: SIGN_OUT,
+        axios.post('/api/auth/logout').then(() => {
+            dispatch({ type: SIGN_OUT });
+            localStorage.setItem('logout', Date.now()); // trigger event for all other opened tabs
         })
     }
 }

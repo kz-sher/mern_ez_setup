@@ -97,7 +97,7 @@ const confirmEmail = (req, res, next) => {
             });
         },
         function({ decoded, user }, done){
-            if(decoded.uid === user.uid && decoded.type === "email_confirmation"){ // Check if ids r same as well as type
+            if(decoded.uid === user.uid && decoded.type === 'email_confirmation'){ // Check if ids r same as well as type
                 user.is_email_confirmed = true;
                 user.save(err => done(err, 'email_confirmed'));
             }
@@ -148,7 +148,7 @@ const login = (req, res, next) => {
             const { accessToken, accessTokenExpiry } = generateAccessToken({ uid: user.uid });
             const { refreshToken, refreshTokenExpiry } = generateRefreshToken({ uid: user.uid })
             
-            res.cookie("rf_tk", refreshToken, {
+            res.cookie('rf_tk', refreshToken, {
                 expires: new Date(refreshTokenExpiry),
                 secure: false, // set to true if https is used
                 httpOnly: true,
@@ -161,6 +161,15 @@ const login = (req, res, next) => {
     ], function(err) {
         next(err);
     });
+}
+
+/**
+ * Flow: Logout
+ * Simply delete refresh token cookie by its key
+ */
+const logout = (req, res) => {
+    res.clearCookie('rf_tk');
+    res.sendStatus(200);
 }
 
 /**
@@ -265,7 +274,7 @@ const resetPassword = (req, res, next) => {
             });
         },
         function({ decoded, user }, done){
-            if(decoded.uid === user.uid && decoded.type === "password_reset"){ // Check if ids r same as well as type
+            if(decoded.uid === user.uid && decoded.type === 'password_reset'){ // Check if ids r same as well as type
                 user.password = newPassword;
                 user.save(err => done(err, 'done'));
             }
@@ -285,6 +294,7 @@ module.exports = {
     register,
     confirmEmail,
     login,
+    logout,
     renewToken,
     forgotPassword,
     resetPassword, 

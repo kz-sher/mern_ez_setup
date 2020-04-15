@@ -20,7 +20,9 @@ const mapStateToProps = state => ({
 })
 
 MainNavBar.propTypes = {
-    isAuthenticated: PropTypes.bool.isRequired
+    isAuthenticated: PropTypes.bool.isRequired,
+    handleSidebarOpen: PropTypes.func.isRequired,
+    signOut: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps, { signOut })(MainNavBar);

@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { confirmEmail } from 'actions/auth.action';
 
 class EmailConfirmation extends Component {
@@ -13,6 +14,15 @@ class EmailConfirmation extends Component {
     render() {
         return null;
     }
+}
+
+EmailConfirmation.propTypes = {
+    match: PropTypes.shape({
+        params: PropTypes.shape({
+            uid: PropTypes.string.isRequired,
+            token: PropTypes.string.isRequired
+        }).isRequired
+    }).isRequired
 }
 
 export default connect(null, { confirmEmail })(EmailConfirmation);

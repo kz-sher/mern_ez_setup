@@ -1,5 +1,6 @@
-import React from 'react'
-import { Segment, Form } from 'semantic-ui-react'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Segment, Form } from 'semantic-ui-react';
 import TextField from '../form/TextField';
 import PasswordField from '../form/PasswordField';
 
@@ -14,5 +15,10 @@ const LoginForm = ({ isSubmitting, handleSubmit}) => {
         </Form>
     )
 }
+
+LoginForm.propTypes = {
+    isSubmitting: PropTypes.bool.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
+};
 
 export default LoginForm;

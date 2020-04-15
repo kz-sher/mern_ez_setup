@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { Sidebar, Menu } from 'semantic-ui-react';
 import OnlyIf from 'components/utils/OnlyIf';
 
@@ -9,7 +10,7 @@ const styles = {
     }
 }
 
-const SideNavBar = ({ isAuthenticated, sidebarOpened, handleSidebarClose, handleSignOut }) => {
+const SideBar = ({ isAuthenticated, sidebarOpened, handleSidebarClose, handleSignOut }) => {
     return (
         <Sidebar
             as={Menu}
@@ -34,4 +35,11 @@ const SideNavBar = ({ isAuthenticated, sidebarOpened, handleSidebarClose, handle
     )
 }
 
-export default SideNavBar;
+SideBar.propTypes = {
+    isAuthenticated: PropTypes.bool.isRequired,
+    sidebarOpened: PropTypes.bool.isRequired,
+    handleSidebarClose: PropTypes.func.isRequired,
+    handleSignOut: PropTypes.func.isRequired,
+};
+
+export default SideBar;

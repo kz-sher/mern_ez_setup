@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types';
 import { Segment, Form } from 'semantic-ui-react'
 import TextField from '../form/TextField';
 
@@ -12,5 +13,10 @@ const ForgotPasswordForm = ({ isSubmitting, handleSubmit}) => {
         </Form>
     )
 }
+
+ForgotPasswordForm.propTypes = {
+    isSubmitting: PropTypes.bool.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
+};
 
 export default ForgotPasswordForm;

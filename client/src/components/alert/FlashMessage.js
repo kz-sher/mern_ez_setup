@@ -1,7 +1,8 @@
 import React from 'react'
+import PropTypes from 'prop-types';
 import { Message } from 'semantic-ui-react'
 
-const StatusMessage = ({ show, status, header, content }) => {
+const FlashMessage = ({ show, status, header, content }) => {
     return (
         <>
             {show && 
@@ -16,4 +17,13 @@ const StatusMessage = ({ show, status, header, content }) => {
     )
 }
 
-export default StatusMessage
+FlashMessage.propTypes = {
+    show: PropTypes.bool.isRequired,
+    status: PropTypes.string.isRequired,
+    header: PropTypes.string,
+    content: PropTypes.string,
+};
+
+
+
+export default FlashMessage

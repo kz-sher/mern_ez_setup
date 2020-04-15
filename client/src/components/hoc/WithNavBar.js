@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Sidebar } from 'semantic-ui-react';
 import MainSideBar from 'containers/layout/MainSideBar';
 import MainNavBar from 'containers/layout/MainNavBar';
@@ -41,5 +42,9 @@ const WithNavBar = (OriginalComponent) => {
     }
     return OriginalComponentWithNavBar;
 }
+
+WithNavBar.propTypes = {
+    OriginalComponent: PropTypes.element.isRequired,
+};
 
 export default WithNavBar;

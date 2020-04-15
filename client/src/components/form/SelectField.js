@@ -1,7 +1,8 @@
 import React from 'react';
-import { Form } from 'semantic-ui-react'
+import PropTypes from 'prop-types';
+import { Form } from 'semantic-ui-react';
 import { ErrorMessage} from 'formik';
-import Select from 'react-select'
+import Select from 'react-select';
 import { labelize } from '../../utils/form.util';
 
 const styles={
@@ -29,5 +30,12 @@ const SelectField = ({ name, handler, opt, val }) => {
             <ErrorMessage name={name} component='div' style={styles.error} />
             </>)
 }
+
+SelectField.propTypes = {
+    name: PropTypes.string.isRequired,
+    handler: PropTypes.func.isRequired,
+    opt: PropTypes.arrayOf(PropTypes.object).isRequired,
+    val: PropTypes.object.isRequired,
+};
 
 export default SelectField;

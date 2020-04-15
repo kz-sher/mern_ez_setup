@@ -1,5 +1,6 @@
-import React from 'react'
-import { Segment, Form } from 'semantic-ui-react'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Segment, Form } from 'semantic-ui-react';
 import COUNTRIES_OPTIONS from '../../data/countries.json';
 import GENDER_OPTIONS from '../../data/genders.json';
 import TextField from '../form/TextField';
@@ -23,5 +24,12 @@ const SignupForm = ({ values, isSubmitting, handleSelectChange, handleSubmit}) =
         </Form>
     )
 }
+
+SignupForm.propTypes = {
+    values: PropTypes.object.isRequired,
+    isSubmitting: PropTypes.bool.isRequired,
+    handleSelectChange: PropTypes.func.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
+};
 
 export default SignupForm;

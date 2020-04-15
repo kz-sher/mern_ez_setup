@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import FlashMessage from 'components/alert/FlashMessage';
 import EventEmitter from 'utils/EventEmitter';
 
@@ -34,5 +35,9 @@ class GeneralFlashMessage extends Component {
         )
     }
 }
+
+GeneralFlashMessage.propTypes = {
+    event: PropTypes.string.isRequired,
+};
 
 export default GeneralFlashMessage;

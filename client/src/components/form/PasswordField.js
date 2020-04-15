@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Form } from 'semantic-ui-react'
+import PropTypes from 'prop-types';
+import { Form } from 'semantic-ui-react';
 import { Field, ErrorMessage} from 'formik';
 import { labelize } from '../../utils/form.util';
 
@@ -35,5 +36,9 @@ const PasswordField = ({ name }) => {
             <ErrorMessage name={name} component='div' style={styles.error} />
             </>)
 }
+
+PasswordField.propTypes = {
+    name: PropTypes.string.isRequired,
+};
 
 export default PasswordField;

@@ -58,7 +58,9 @@ const NavBar = ({ isAuthenticated, handleSidebarOpen, handleSignOut }) => {
 }
 
 NavBar.propTypes = {
-    isAuthenticated: PropTypes.bool.isRequired
+    isAuthenticated: PropTypes.bool.isRequired,
+    handleSidebarOpen: PropTypes.func.isRequired,
+    handleSignOut: PropTypes.func.isRequired,
 };
 
 export default NavBar;

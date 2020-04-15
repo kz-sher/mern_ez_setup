@@ -35,6 +35,9 @@ const NavBar = ({ isAuthenticated, handleSidebarOpen, handleSignOut }) => {
                         <Responsive as={Menu.Item} minWidth={Responsive.onlyTablet.minWidth}>
                             <Link to='/dashboard' style={styles.link}>Dashboard</Link>
                         </Responsive>
+                        <Responsive as={Menu.Item} minWidth={Responsive.onlyTablet.minWidth}>
+                            <Link to='/products' style={styles.link}>Products</Link>
+                        </Responsive>
                     </OnlyIf>
                     <Menu.Item position='right'>
                         <OnlyIf condition={!isAuthenticated}>

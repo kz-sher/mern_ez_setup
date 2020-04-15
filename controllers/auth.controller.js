@@ -10,6 +10,7 @@ const { User } = require('@models');
 const { 
     BadReqError, 
     UnAuthError, 
+    ForbiddenError,
     EmailError, 
 } = require('@errors');
 const Mailer = require('@services/email/email.service');
@@ -114,8 +115,8 @@ const confirmEmail = (req, res, next) => {
 
 /**
  * Flow: Login
- * 1. Check if email is confirmed
- * 2. Check if password given & hashed one in DB are the same
+ * 1. Check if password given & hashed one in DB are the same
+ * 2. Check if email is confirmed
  * 3. Generate access & refresh token
  * 4. Send refresh token in cookie & access token in response
  * Any condition above that is not met will be responded with error message
@@ -127,9 +128,6 @@ const confirmEmail = (req, res, next) => {
  */
 const login = (req, res, next) => {
     const user = req.user
-    if(!user.is_email_confirmed){
-        return next(new UnAuthError(EMAIL_MUST_CONF));
-    }
 
     async.waterfall([
         function(done){
@@ -142,6 +140,11 @@ const login = (req, res, next) => {
             }); 
         },
         function(done){
+
+            if(!user.is_email_confirmed){ // Check if user confirms his/her email
+                return done(new ForbiddenError(EMAIL_MUST_CONF));
+            }
+
             const { accessToken, accessTokenExpiry } = generateAccessToken({ uid: user.uid });
             const { refreshToken, refreshTokenExpiry } = generateRefreshToken({ uid: user.uid })
             
@@ -177,7 +180,7 @@ const renewToken = (req, res, next) => {
         },
         function(decoded, done){
             const { accessToken, accessTokenExpiry } = generateAccessToken({ uid: decoded.uid });
-            res.status(200).json({ accessToken, accessTokenExpiry, refresh: true });
+            res.status(200).json({ accessToken, accessTokenExpiry });
             done(null, 'done');
         }
     ],function(err){

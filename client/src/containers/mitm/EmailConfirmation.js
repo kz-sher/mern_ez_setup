@@ -5,6 +5,10 @@ import { confirmEmail } from 'actions/auth.action';
 
 class EmailConfirmation extends Component {
     
+    state = {
+        percent: 0
+    }
+
     constructor(props){
         super(props);
         const { uid, token } = this.props.match.params;

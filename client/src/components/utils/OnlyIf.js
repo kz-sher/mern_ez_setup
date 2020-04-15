@@ -8,10 +8,8 @@ const OnlyIf = (props) => {
 
 
 OnlyIf.propTypes = {
-    props: PropTypes.shape({
-        condition: PropTypes.bool.isRequired,
-        children: PropTypes.node.isRequired,
-    })
+    condition: PropTypes.bool.isRequired,
+    children: PropTypes.node.isRequired,
 }
 
 export default OnlyIf;

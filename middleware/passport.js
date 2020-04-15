@@ -2,10 +2,11 @@ if (process.env.NODE_ENV !== 'production'){
     require('dotenv').config();
 }
 
-const JwtStrategy = require("passport-jwt").Strategy;
-const { fromAuthHeaderAsBearerToken } = require("passport-jwt").ExtractJwt;
-const { User } = require('@models');
 const passport = require('passport');
+const JwtStrategy = require('passport-jwt').Strategy;
+const { fromAuthHeaderAsBearerToken } = require('passport-jwt').ExtractJwt;
+const { isEmpty } = require('lodash');
+const { User } = require('@models');
 
 async function authenticateUserByJwt(payload, done){
     User.findOne({ uid: payload.uid }).then((user, err) => {

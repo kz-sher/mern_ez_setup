@@ -3,13 +3,13 @@ import { setAuthHeader } from 'utils/auth.util.js';
 import { translateErrorToMsg } from 'utils/general.util.js'
 import EventEmitter from 'utils/EventEmitter';
 import history from 'utils/history';
+import { initDone } from './init.action';
 import { SIGN_IN, SIGN_OUT } from './types';
 
 export const signUp = ({ userData, setErrors, setSubmitting, resetForm }) => {
     return dispatch => {
         axios.post('/api/auth/register', userData).then(
             ({ data: { msg } }) => {
-                console.log(msg)
                 EventEmitter.emit('SIGNUP', { status: 'success', msg });
                 resetForm();
                 setSubmitting(false);
@@ -108,6 +108,23 @@ export const confirmEmail = (uid, token) => {
                 const err = translateErrorToMsg(data);
                 history.push('/login');
                 EventEmitter.emit('LOGIN', { status: 'error', msg: err });
+            },
+        );
+    }
+}
+
+export const initUserState = () => {
+    return dispatch => {
+        return axios.post(`/api/auth/token`).then(
+            ({ data: { accessToken } }) => {
+                setAuthHeader(accessToken);
+                dispatch(signIn(accessToken));
+                dispatch(initDone());
+            },
+            ({ response: { data } }) => {
+                const err = translateErrorToMsg(data);
+                console.log(err);
+                dispatch(initDone());
             },
         );
     }

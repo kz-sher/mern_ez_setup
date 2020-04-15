@@ -9,11 +9,9 @@ const If = (props) => {
 };
 
 If.propTypes = {
-    props: PropTypes.shape({
-        condition: PropTypes.bool.isRequired,
-        then: PropTypes.node.isRequired,
-        else: PropTypes.node.isRequired,
-    }).isRequired
+    condition: PropTypes.bool.isRequired,
+    then: PropTypes.node.isRequired,
+    else: PropTypes.node.isRequired,
 }
 
 export default If;

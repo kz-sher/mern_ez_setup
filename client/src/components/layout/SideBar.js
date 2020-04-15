@@ -29,6 +29,7 @@ const SideBar = ({ isAuthenticated, sidebarOpened, handleSidebarClose, handleSig
             </OnlyIf>
             <OnlyIf condition={isAuthenticated}>
                 <Menu.Item as={Link} to='/dashboard'>Dashboard</Menu.Item>
+                <Menu.Item as={Link} to='/products'>Products</Menu.Item>
                 <Menu.Item onClick={handleSignOut}>Log Out</Menu.Item>
             </OnlyIf>
         </Sidebar>

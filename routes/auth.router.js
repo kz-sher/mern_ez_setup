@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const AuthController = require('@controllers/auth.controller')
-// const { handlePassportError } = require('../utils/error.helper');
+// const { handlePassportError } = require('@utils/error.util');
 // const { PassportJWT } = require('../middleware/passport');
 const {
     RegisterValidator,

@@ -3,14 +3,15 @@ import { Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import If from 'components/utils/If';
+import NavBarWrapper from 'containers/layout/NavBarWrapper';
 
-const PrivateRoute = ({ component: Component, isAuthenticated, ...otherProps }) => (
+const UserRoute = ({ component: Component, isAuthenticated, ...otherProps }) => (
    <Route
       {...otherProps}
       render={props =>
          <If condition={isAuthenticated} 
-            then={<Component {...props} />}
-            else={<Redirect to="/login" />}
+            then={ <NavBarWrapper><Component {...props} /></NavBarWrapper> }
+            else={ <Redirect to='/login' /> }
          />
       }
    />
@@ -20,10 +21,8 @@ const mapStateToProps = state => ({
    isAuthenticated: state.auth.isAuthenticated
 });
 
-PrivateRoute.propTypes = {
-   component: PropTypes.element.isRequired,
+UserRoute.propTypes = {
    isAuthenticated: PropTypes.bool.isRequired,
-   otherProps: PropTypes.object.isRequired,
 };
 
-export default connect(mapStateToProps)(PrivateRoute);
+export default connect(mapStateToProps)(UserRoute);

@@ -1,18 +1,30 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { Route, Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import NavBarWrapper from 'containers/layout/NavBarWrapper';
+import OnlyIf from 'components/utils/OnlyIf';
 
-const GuestRoute = ({ component: Component, ...otherProps }) => (
+const GuestRoute = ({ component: Component, isAuthenticated, ...otherProps }) => (
    <Route
       {...otherProps}
       render={props =>
             <NavBarWrapper>
-                <Component {...props} />
+               <OnlyIf condition={isAuthenticated}>
+                  <Redirect to='/' />
+               </OnlyIf>
+               <Component {...props} />
             </NavBarWrapper>
       }
    />
 );
 
+const mapStateToProps = state => ({
+   isAuthenticated: state.auth.isAuthenticated
+});
 
+GuestRoute.propTypes = {
+   isAuthenticated: PropTypes.bool.isRequired,
+};
 
-export default GuestRoute;
+export default connect(mapStateToProps)(GuestRoute);

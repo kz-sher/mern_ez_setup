@@ -3,3 +3,7 @@ export const SIGN_IN = 'SIGN_IN';
 export const SIGN_OUT = 'SIGN_OUT';
 export const SHOW_STATUS_MSG = 'SHOW_STATUS_MSG';
 export const HIDE_STATUS_MSG = 'HIDE_STATUS_MSG';
+export const OPEN_SIDEBAR = 'OPEN_SIDEBAR';
+export const CLOSE_SIDEBAR = 'CLOSE_SIDEBAR';
+export const OPEN_LOGINPOPUP = 'OPEN_LOGINPOPUP';
+export const CLOSE_LOGINPOPUP = 'CLOSE_LOGINPOPUP';

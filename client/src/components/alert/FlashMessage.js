@@ -2,7 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import { Message } from 'semantic-ui-react'
 
-const FlashMessage = ({ show, status, header, content }) => {
+const styles = {
+    message: {
+        textAlign: 'center'
+    }
+}
+const FlashMessage = ({ show, status, header, content, style }) => {
     return (
         <>
             {show && 
@@ -12,6 +17,7 @@ const FlashMessage = ({ show, status, header, content }) => {
                 warning={status==='warning'}
                 header={header} 
                 content={content}
+                style={styles.message}
             />}
         </>
     )
@@ -22,6 +28,7 @@ FlashMessage.propTypes = {
     status: PropTypes.string.isRequired,
     header: PropTypes.string,
     content: PropTypes.string,
+    style: PropTypes.object,
 };
 
 

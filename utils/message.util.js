@@ -50,7 +50,8 @@ const message = {
         content: 'Please contact our customer service for assistance'
     },
     INV_CRE: 'Invalid Credentials',
-    EMAIL_MUST_CONF: 'Email Confirmation Required'
+    EMAIL_MUST_CONF: 'Email Confirmation Required',
+    USER_404: 'User Not Found'
 }
 
 module.exports = message;

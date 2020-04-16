@@ -7,11 +7,13 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const { fromAuthHeaderAsBearerToken } = require('passport-jwt').ExtractJwt;
 const { isEmpty } = require('lodash');
 const { User } = require('@models');
+const { NotFoundError } = require('@errors');
+const { USER_404 } = require('@utils/message.util');
 
 async function authenticateUserByJwt(payload, done){
     User.findOne({ uid: payload.uid }).then((user, err) => {
         if(!isEmpty(user)) return done(null, user);
-        if(isEmpty(user)) return done('404');
+        if(isEmpty(user)) return done(new NotFoundError(USER_404));
         if(err) return done(err);
     });
 }

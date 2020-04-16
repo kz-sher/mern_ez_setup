@@ -11,8 +11,7 @@ class EmailConfirmation extends Component {
 
     constructor(props){
         super(props);
-        const { uid, token } = this.props.match.params;
-        this.props.confirmEmail(uid, token);
+        this.props.confirmEmail(this.props.match.params);
     }
 
     render() {

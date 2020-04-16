@@ -5,7 +5,6 @@ if (process.env.NODE_ENV !== 'production'){
 require('module-alias/register')
 const express = require('express');
 const app = express();
-// const fs = require('fs');
 const cors = require('cors');
 const logger = require('morgan')
 const bodyParser = require('body-parser');
@@ -13,7 +12,7 @@ const cookieParser = require("cookie-parser");
 const mongoose = require('mongoose');
 const passport = require('passport');
 const PORT = process.env.PORT;
-const { RedirectRouter, AuthRouter } = require('@routes');
+const { AuthRouter } = require('@routes');
 const { ErrorLogger } = require('@middleware/error_handler/ErrorLogger');
 const { GeneralErrorHandler } = require('@middleware/error_handler/GeneralErrorHandler');
 const { initializePassport } = require('@middleware/passport');
@@ -33,22 +32,13 @@ connection.once('open', function() {
     console.log("MongoDB database connection established successfully");
 })
 
-// Just make sure uploads folder there
-// Create a random txt file to avoid heroku error
-// if (!fs.existsSync('./uploads')){
-//     fs.mkdirSync('./uploads');
-//     fs.closeSync(fs.openSync('random.txt', 'w'));
-// }
-
 app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
-// app.use('/static', express.static('uploads'))
-// app.use(RedirectRouter);
-app.use('/api/auth', AuthRouter);
+app.use('/api/v1/auth', AuthRouter);
 app.use(ErrorLogger);
 app.use(GeneralErrorHandler);
 app.listen(PORT, function() {

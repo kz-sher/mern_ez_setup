@@ -1,14 +1,16 @@
-import axios from 'axios';
-import { setAuthHeader } from 'utils/auth.util.js';
-import { translateErrorToMsg } from 'utils/general.util.js'
+import store from 'config/store';
+import history from 'config/history';
+import authaxios from 'routes/authaxios';
 import EventEmitter from 'utils/EventEmitter';
-import history from 'utils/history';
+import { setAuthHeader } from 'utils/auth.util';
+import { translateErrorToMsg } from 'utils/general.util'
 import { initDone } from './init.action';
+import { closeLoginPopup } from './view.action';
 import { SIGN_IN, SIGN_OUT } from './types';
 
 export const signUp = ({ userData, setErrors, setSubmitting, resetForm }) => {
     return dispatch => {
-        axios.post('/api/auth/register', userData).then(
+        authaxios.register(userData).then(
             ({ data: { msg } }) => {
                 EventEmitter.emit('SIGNUP', { status: 'success', msg });
                 resetForm();
@@ -28,13 +30,21 @@ export const signUp = ({ userData, setErrors, setSubmitting, resetForm }) => {
     }
 }
 
-export const login = ({ userData, setErrors, setSubmitting }) => {
+export const login = ({ userData, fromPopup, setErrors, setSubmitting }) => {
     return dispatch => {
-        axios.post('/api/auth/login', userData).then(
+        authaxios.login(userData).then(
             ({ data: { accessToken } }) => {
                 setAuthHeader(accessToken);
                 dispatch(signIn(accessToken));
-                history.push('/dashboard');;
+                // Check if login from popup
+                if(fromPopup){
+                    dispatch(closeLoginPopup());
+                    setSubmitting(false);
+                }
+                else{
+                    history.push('/dashboard');
+                }
+                
             },
             ({ response: { data, status } }) => {
                 if(status === 422){ // Set form error if exists
@@ -52,7 +62,7 @@ export const login = ({ userData, setErrors, setSubmitting }) => {
 
 export const forgotPwd = ({ userData, setErrors, setSubmitting, resetForm }) => {
     return dispatch => {
-        axios.post('/api/auth/forgotpwd', userData).then(
+        authaxios.forgotPwd(userData).then(
             ({ data: { msg } }) => {
                 EventEmitter.emit('FORGOTPWD', { status: 'success', msg });
                 resetForm();
@@ -74,10 +84,7 @@ export const forgotPwd = ({ userData, setErrors, setSubmitting, resetForm }) => 
 
 export const resetPwd = ({ userData, params, setErrors, setSubmitting }) => {
     return dispatch => {
-        
-        const { uid, token } = params;
-
-        axios.post(`/api/auth/resetPwd/${uid}/${token}`, userData).then(
+        authaxios.resetPwd(params, userData).then(
             ({ data: { msg } }) => {
                 history.push('/login');
                 EventEmitter.emit('LOGIN', { status: 'success', msg });
@@ -97,9 +104,9 @@ export const resetPwd = ({ userData, params, setErrors, setSubmitting }) => {
     }
 }
 
-export const confirmEmail = (uid, token) => {
+export const confirmEmail = (params) => {
     return dispatch => {
-        axios.post(`/api/auth/email_confirmation/${uid}/${token}`).then(
+        authaxios.confirmEmail(params).then(
             ({ data: { msg } }) => {
                 history.push('/login');
                 EventEmitter.emit('LOGIN', { status: 'success', msg });
@@ -115,14 +122,17 @@ export const confirmEmail = (uid, token) => {
 
 export const initUserState = () => {
     return dispatch => {
-        return axios.post(`/api/auth/token`).then(
-            ({ data: { accessToken } }) => {
-                setAuthHeader(accessToken);
-                dispatch(signIn(accessToken));
-                dispatch(initDone());
-            },
-            () => { dispatch(initDone()) },
-        );
+        const isUserAuthenticated = store.getState().auth.isAuthenticated;
+        if(!isUserAuthenticated){
+            authaxios.renewToken().then(
+                ({ data: { accessToken } }) => {
+                    setAuthHeader(accessToken);
+                    dispatch(signIn(accessToken));
+                    dispatch(initDone());
+                },
+                () => { dispatch(initDone()) },
+            );
+        }
     }
 }
 
@@ -132,11 +142,19 @@ export const signIn = token => {
     }
 }
 
-export const signOut = () => {
+export const signOut = (redirect='/') => {
     return dispatch => {
-        axios.post('/api/auth/logout').then(() => {
-            dispatch({ type: SIGN_OUT });
+        authaxios.logout().then(() => {
+            dispatch({ type: SIGN_OUT, redirect });
             localStorage.setItem('logout', Date.now()); // trigger event for all other opened tabs
         })
+    }
+}
+
+export const testSilentRefresh = () => {
+    return dispatch => {
+        authaxios.getSecret().then(() => {
+            console.log('secret');
+        }).catch(err=>err);
     }
 }

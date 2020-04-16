@@ -1,5 +1,7 @@
 import React from 'react'
 import { Grid, Button, Header, Message, Segment } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import { testSilentRefresh } from 'actions/auth.action';
 
 const styles = {
     root: {
@@ -7,7 +9,8 @@ const styles = {
     }
 }
 
-function DashboardPage() {
+function DashboardPage({testSilentRefresh}) {
+    testSilentRefresh();
     return (
         <Segment style={styles.root} vertical>
             <Grid container>
@@ -27,4 +30,4 @@ function DashboardPage() {
     )
 }
 
-export default DashboardPage;
+export default connect(null, { testSilentRefresh })(DashboardPage);

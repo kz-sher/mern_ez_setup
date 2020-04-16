@@ -17,6 +17,12 @@ const styles = {
 }
 
 const NavBar = ({ isAuthenticated, handleSidebarOpen, handleSignOut }) => {
+
+    const signOut = e => {
+        e.persist();
+        handleSignOut();
+    }
+
     return (
         <Segment vertical>
             <Container>
@@ -49,7 +55,7 @@ const NavBar = ({ isAuthenticated, handleSidebarOpen, handleSignOut }) => {
                             </Button>
                         </OnlyIf>
                         <OnlyIf condition={isAuthenticated}>
-                            <Button basic onClick={handleSignOut}>
+                            <Button basic onClick={signOut}>
                                 Log Out
                             </Button>
                         </OnlyIf> 

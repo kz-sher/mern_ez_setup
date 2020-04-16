@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "nodemon server.js"
+    "server": "nodemon --ignore 'client/' server.js",
+    "client": "npm run start --prefix client",
+    "dev": "concurrently 'npm run client' 'npm run server'"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +15,7 @@
     "async": "^3.2.0",
     "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
+    "concurrently": "^5.1.0",
     "console-info": "0.0.5",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -24,7 +27,7 @@
     "lodash": "^4.17.15",
     "module-alias": "^2.2.2",
     "moment": "^2.24.0",
-    "mongoose": "^5.9.7",
+    "mongoose": "^5.9.9",
     "mongoose-auto-increment": "^5.0.1",
     "morgan": "^1.10.0",
     "nodemailer": "^6.4.6",
@@ -33,18 +36,19 @@
     "nodemon": "^2.0.2",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "redux-persist": "^6.0.0"
   },
   "_moduleAliases": {
-    "@controllers" : "controllers",
-    "@models" : "models",
-    "@routes" : "routes",
-    "@services" : "services",
-    "@middleware" : "middleware",
-    "@validation" : "middleware/validation",
-    "@vvalidators" : "middleware/validation/validators",
-    "@vhelpers" : "middleware/validation/helpers",
-    "@utils" : "utils",
-    "@errors" : "errors"
+    "@controllers": "controllers",
+    "@models": "models",
+    "@routes": "routes",
+    "@services": "services",
+    "@middleware": "middleware",
+    "@validation": "middleware/validation",
+    "@vvalidators": "middleware/validation/validators",
+    "@vhelpers": "middleware/validation/helpers",
+    "@utils": "utils",
+    "@errors": "errors"
   }
 }

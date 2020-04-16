@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 import { signOut } from 'actions/auth.action';
 import SideBar from 'components/layout/SideBar';
 
-const MainSideBar = ({ isAuthenticated, sidebarOpened, handleSidebarClose, signOut }) => {
+const MainSideBar = ({ isAuthenticated, sidebarOpen, handleSidebarClose, signOut }) => {
     return ( 
         <SideBar 
             isAuthenticated={isAuthenticated} 
             handleSidebarClose={handleSidebarClose}
-            sidebarOpened={sidebarOpened} 
+            sidebarOpen={sidebarOpen} 
             handleSignOut={signOut} 
             // role={'User'}
         />
@@ -22,7 +22,7 @@ const mapStateToProps = state => ({
 
 MainSideBar.propTypes = {
     isAuthenticated: PropTypes.bool.isRequired,
-    sidebarOpened: PropTypes.bool.isRequired,
+    sidebarOpen: PropTypes.bool.isRequired,
     handleSidebarClose: PropTypes.func.isRequired,
     signOut: PropTypes.func.isRequired,
 };

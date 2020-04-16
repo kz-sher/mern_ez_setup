@@ -10,7 +10,13 @@ const styles = {
     }
 }
 
-const SideBar = ({ isAuthenticated, sidebarOpened, handleSidebarClose, handleSignOut }) => {
+const SideBar = ({ isAuthenticated, sidebarOpen, handleSidebarClose, handleSignOut }) => {
+
+    const signOut = e => {
+        e.persist();
+        handleSignOut();
+    }
+
     return (
         <Sidebar
             as={Menu}
@@ -18,7 +24,7 @@ const SideBar = ({ isAuthenticated, sidebarOpened, handleSidebarClose, handleSig
             inverted
             onHide={handleSidebarClose}
             vertical
-            visible={sidebarOpened}
+            visible={sidebarOpen}
             width='thin'
             style={styles.sidebar}
             >
@@ -30,7 +36,7 @@ const SideBar = ({ isAuthenticated, sidebarOpened, handleSidebarClose, handleSig
             <OnlyIf condition={isAuthenticated}>
                 <Menu.Item as={Link} to='/dashboard'>Dashboard</Menu.Item>
                 <Menu.Item as={Link} to='/products'>Products</Menu.Item>
-                <Menu.Item onClick={handleSignOut}>Log Out</Menu.Item>
+                <Menu.Item onClick={signOut}>Log Out</Menu.Item>
             </OnlyIf>
         </Sidebar>
     )
@@ -38,7 +44,7 @@ const SideBar = ({ isAuthenticated, sidebarOpened, handleSidebarClose, handleSig
 
 SideBar.propTypes = {
     isAuthenticated: PropTypes.bool.isRequired,
-    sidebarOpened: PropTypes.bool.isRequired,
+    sidebarOpen: PropTypes.bool.isRequired,
     handleSidebarClose: PropTypes.func.isRequired,
     handleSignOut: PropTypes.func.isRequired,
 };

@@ -24,6 +24,7 @@ const LoginPage = ({
     isSubmitting,
     handleSubmit,
 }) =>{
+
     return (
         <Grid container style={styles.root}>
             <Grid.Column style={{ maxWidth: 450 }}>

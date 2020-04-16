@@ -2,8 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Router, Switch, Route } from 'react-router';
 import OnlyIf from './components/utils/OnlyIf';
-import UserRoute from './containers/route/UserRoute';
+import PublicRoute from './containers/route/PublicRoute';
 import GuestRoute from './containers/route/GuestRoute';
+import UserRoute from './containers/route/UserRoute';
 import NotFound from './components/layout/NotFound';
 import HomePage from './components/layout/HomePage';
 import EmailConfirmation from './containers/mitm/EmailConfirmation';
@@ -13,7 +14,8 @@ import LoginPage from './containers/auth/LoginPage';
 import SignupPage from './containers/auth/SignupPage';
 import ForgotPwdPage from './containers/auth/ForgotPwdPage';
 import ResetPwdPage from './containers/auth/ResetPwdPage';
-import history from './utils/history';
+import LoginPopup from './containers/auth/LoginPopup';
+import history from './config/history';
 
 const App = ({ isUserInitialized }) => {
   
@@ -21,16 +23,17 @@ const App = ({ isUserInitialized }) => {
       <Router history={history}>
         <OnlyIf condition={isUserInitialized}>
           <Switch>
-            <GuestRoute exact path='/' component={HomePage} />
-            <GuestRoute path='/login' component={LoginPage} />
-            <GuestRoute path='/signup' component={SignupPage} />
-            <GuestRoute path='/forgotpwd' component={ForgotPwdPage} />
+            <PublicRoute exact path='/' component={HomePage} />
+            <GuestRoute exact path='/login' component={LoginPage} />
+            <GuestRoute exact path='/signup' component={SignupPage} />
+            <GuestRoute exact path='/forgotpwd' component={ForgotPwdPage} />
             <GuestRoute path='/resetpwd/:uid/:token' component={ResetPwdPage} />
             <Route path='/email_confirmation/:uid/:token' component={EmailConfirmation} />
             <UserRoute exact path='/dashboard' component={DashboardPage} />
             <UserRoute exact path='/products' component={ProductPage} />
-            <GuestRoute component={NotFound} />
+            <PublicRoute path component={NotFound} />
           </Switch>
+          <LoginPopup />
         </OnlyIf>
       </Router>
   );

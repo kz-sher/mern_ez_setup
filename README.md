@@ -5,6 +5,7 @@ Mern Ez Setup is just a simple MERN boilerplate to help you kickstart your mini 
 ## Features
 
 Functional parts:
+
 - Login (cross tabs)
 - Logout (cross tabs)
 - Register
@@ -16,6 +17,7 @@ Functional parts:
 - Redirect for protected route and guest route (if user is already logged in)
 
 Presentational parts:
+
 - Form field error display
 - Status message display
 - Pushable sidebar
@@ -28,7 +30,24 @@ Presentational parts:
 
 ## Installation
 
-1. Just clone this repository by issuing the following command in your terminal
+#### Software
+
+- Text Editor/ IDE for code* (e.g. Sublime Text, VSCode, etc.)
+- Postman
+- MongoDB Compass
+
+(*: required)
+
+#### Extension
+
+- React Development Tools
+- Redux DevTools*
+
+(*: required)
+
+#### Terminal
+
+1. Just clone this repository by issuing the following command in your terminal:
 
 ```bash
 git clone <repo-link>
@@ -68,8 +87,9 @@ TOKEN_ID_DIGITS = <NUM>
 MAILTRAP_USERNAME = <CHECK ON MAILTRAP>
 MAILTRAP_PASSWORD = <CHECK ON MAILTRAP>
 MONGODB_URI = <URL, e.g. mongodb://127.0.0.1:27017/database_name>
-PORT = <NUMBER, e.g 3000, 5000, etc >
+PORT = <NUMBER, e.g 3000, 5000, etc.>
 ```
 
 ## Got question?
+
 > kzsherdev@gmail.com

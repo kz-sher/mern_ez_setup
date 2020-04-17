@@ -29,3 +29,11 @@ export const translateErrorToMsg = data => {
         return { header: '[E999] Error Occured' };
     }
 }
+
+export const scrollToPoint = point => {
+    window.scroll({ top: point, left: 0, behavior: 'smooth' });
+};
+
+export const scrollToRef = ref => {
+    return window.scroll({ top: ref.current.offsetTop, left: 0, behavior: 'smooth' });
+}

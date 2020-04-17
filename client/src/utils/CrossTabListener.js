@@ -1,6 +1,6 @@
 import { getStoredState, REHYDRATE } from 'redux-persist'
 
-const CrossBrowserListener = (store, persistConfig) => {
+const CrossTabListener = (store, persistConfig) => {
     return async function() {
         let state = await getStoredState(persistConfig)
   
@@ -12,4 +12,4 @@ const CrossBrowserListener = (store, persistConfig) => {
     }
 }
 
-export default CrossBrowserListener;
+export default CrossTabListener;

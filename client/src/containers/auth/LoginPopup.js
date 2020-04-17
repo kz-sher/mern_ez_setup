@@ -4,16 +4,11 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Grid, Modal } from 'semantic-ui-react';
 import { withFormik } from 'formik';
-import LoginForm from 'components/auth/LoginForm';
+import LoginForm from 'components/form/LoginForm';
 import GeneralFlashMessage from 'containers/alert/GeneralFlashMessage';
 import { login } from 'actions/auth.action';
 
-const LoginPopup = ({
-    errors,
-    loginPopupOpen,
-    isSubmitting,
-    handleSubmit,
-}) =>{
+const LoginPopup = ({ loginPopupOpen }) =>{
 
     return (
         <Modal open={loginPopupOpen} dimmer='blurring' size='tiny' closeOnEscape={false} closeOnDimmerClick={false} >
@@ -22,7 +17,7 @@ const LoginPopup = ({
                 <Grid.Column>
                     <p>Please enter your credentials for session renewal</p>
                     <GeneralFlashMessage event='LOGIN' />
-                    <LoginForm errors={errors} isSubmitting={isSubmitting} handleSubmit={handleSubmit} />
+                    <LoginForm />
                 </Grid.Column>
             </Modal.Content>
         </Modal>
@@ -49,10 +44,7 @@ const mapStateToProps = state => ({
 });
 
 LoginPopup.propTypes = {
-    errors: PropTypes.object.isRequired,
     loginPopupOpen: PropTypes.bool.isRequired,
-    isSubmitting: PropTypes.bool.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
 };
 
 export default compose(

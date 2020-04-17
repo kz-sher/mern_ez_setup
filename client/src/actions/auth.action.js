@@ -142,11 +142,11 @@ export const signIn = token => {
     }
 }
 
-export const signOut = (redirect='/') => {
+export const signOut = () => {
     return dispatch => {
         authaxios.logout().then(() => {
-            dispatch({ type: SIGN_OUT, redirect });
-            localStorage.setItem('logout', Date.now()); // trigger event for all other opened tabs
+            history.push('/');
+            dispatch({ type: SIGN_OUT });
         })
     }
 }

@@ -1,10 +1,9 @@
 import React from 'react'
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import { Grid, Header } from 'semantic-ui-react';
 import { withFormik } from 'formik';
-import ResetPwdForm from 'components/auth/ResetPwdForm';
+import ResetPwdForm from 'components/form/ResetPwdForm';
 import GeneralFlashMessage from 'containers/alert/GeneralFlashMessage';
 import { resetPwd } from 'actions/auth.action';
 
@@ -18,11 +17,7 @@ const styles = {
     }
 }
 
-const ResetPwdPage = ({
-    errors,
-    isSubmitting,
-    handleSubmit,
-}) =>{
+const ResetPwdPage = () =>{
     return (
         <Grid container style={styles.root}>
             <Grid.Column style={{ maxWidth: 450 }}>
@@ -30,7 +25,7 @@ const ResetPwdPage = ({
                     Reset your password
                 </Header>
                 <GeneralFlashMessage event='RESETPWD' />
-                <ResetPwdForm errors={errors} isSubmitting={isSubmitting} handleSubmit={handleSubmit} />
+                <ResetPwdForm />
             </Grid.Column>
         </Grid>
     );
@@ -51,12 +46,6 @@ const ResetPwdFormik = withFormik({
         resetPwd({ userData: values, params, setErrors, setSubmitting});
     }
 });
-
-ResetPwdPage.propTypes = {
-    errors: PropTypes.object.isRequired,
-    isSubmitting: PropTypes.bool.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
-};
 
 export default compose(
     connect(null, { resetPwd }),

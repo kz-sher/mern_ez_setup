@@ -1,24 +1,19 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Segment, Form } from 'semantic-ui-react';
-import TextField from '../form/TextField';
-import PasswordField from '../form/PasswordField';
+import { useFormikContext } from 'formik';
+import PasswordField from 'components/input/PasswordField';
 
-const LoginForm = ({ isSubmitting, handleSubmit}) => {
+const ResetForm = () => {
+    const { isSubmitting, handleSubmit} = useFormikContext();
     return (
         <Form loading={!!isSubmitting} onSubmit={handleSubmit}>
             <Segment textAlign='left'>
-                <TextField name='email'/>
                 <PasswordField name='password'/>
+                <PasswordField name='password_confirmation' />
                 <Form.Button type='submit' color='blue' size='large' fluid>Submit</Form.Button>
             </Segment>
         </Form>
     )
 }
 
-LoginForm.propTypes = {
-    isSubmitting: PropTypes.bool.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
-};
-
-export default LoginForm;
+export default ResetForm;

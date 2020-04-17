@@ -1,9 +1,10 @@
 import React from 'react'
-import PropTypes from 'prop-types';
 import { Segment, Form } from 'semantic-ui-react'
-import TextField from '../form/TextField';
+import { useFormikContext } from 'formik';
+import TextField from 'components/input/TextField';
 
-const ForgotPasswordForm = ({ isSubmitting, handleSubmit}) => {
+const ForgotPasswordForm = () => {
+    const { isSubmitting, handleSubmit} = useFormikContext();
     return (
         <Form loading={!!isSubmitting} onSubmit={handleSubmit} >
             <Segment textAlign='left'>
@@ -13,10 +14,5 @@ const ForgotPasswordForm = ({ isSubmitting, handleSubmit}) => {
         </Form>
     )
 }
-
-ForgotPasswordForm.propTypes = {
-    isSubmitting: PropTypes.bool.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
-};
 
 export default ForgotPasswordForm;

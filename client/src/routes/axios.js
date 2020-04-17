@@ -39,7 +39,7 @@ axios.interceptors.response.use(
                 return axios.post('/auth/token', '', { interceptEnabled: false }).then(
                         ({ data: { accessToken }}) => {
                             setAuthHeader(accessToken);
-                            store.dispatch(signIn());
+                            store.dispatch(signIn(accessToken));
                             // retry the initially failed request
                             return axios(req)
                         },

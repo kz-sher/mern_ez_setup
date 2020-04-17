@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'semantic-ui-react';
-import { ErrorMessage} from 'formik';
+import { ErrorMessage, useFormikContext } from 'formik';
 import Select from 'react-select';
 import { labelize } from '../../utils/form.util';
 
@@ -14,15 +14,18 @@ const styles={
     }
 }
 
-const SelectField = ({ name, handler, opt, val }) => {
+const SelectField = ({ name, opt }) => {
+    
+    const { values, setFieldValue } = useFormikContext();
+    const initVal = { label: values[name], value: values[name] }
+    const handleChange = selected => setFieldValue(name, selected.value);
 
-    const initVal = { label: val[name], value: val[name] }
     return (<>
             <Form.Field> 
                 <label>{labelize(name)}</label>
                 <Select
                     name={name} 
-                    onChange={handler}
+                    onChange={handleChange}
                     value={initVal}
                     options={opt}
                 />
@@ -33,9 +36,7 @@ const SelectField = ({ name, handler, opt, val }) => {
 
 SelectField.propTypes = {
     name: PropTypes.string.isRequired,
-    handler: PropTypes.func.isRequired,
     opt: PropTypes.arrayOf(PropTypes.object).isRequired,
-    val: PropTypes.object.isRequired,
 };
 
 export default SelectField;

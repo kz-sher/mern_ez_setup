@@ -5,13 +5,13 @@ import PropTypes from 'prop-types';
 import OnlyIf from 'components/utils/OnlyIf';
 import NavBarWrapper from 'containers/layout/NavBarWrapper';
 
-const UserRoute = ({ component: Component, isAuthenticated, redirectUrl, ...otherProps }) => (
+const UserRoute = ({ component: Component, isAuthenticated, ...otherProps }) => (
    <Route
       {...otherProps}
       render={props =>
             <NavBarWrapper>
                <OnlyIf condition={!isAuthenticated} >
-                  <Redirect to={redirectUrl} />
+                  <Redirect to='/login' />
                </OnlyIf>
                <Component {...props} />
             </NavBarWrapper>
@@ -21,12 +21,10 @@ const UserRoute = ({ component: Component, isAuthenticated, redirectUrl, ...othe
 
 const mapStateToProps = state => ({
    isAuthenticated: state.auth.isAuthenticated,
-   redirectUrl: state.auth.redirect
 });
 
 UserRoute.propTypes = {
    isAuthenticated: PropTypes.bool.isRequired,
-   redirectUrl: PropTypes.string.isRequired,
 };
 
 export default connect(mapStateToProps)(UserRoute);

@@ -2,10 +2,10 @@ import React from 'react'
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { Grid, Header, Message } from 'semantic-ui-react';
 import { withFormik } from 'formik';
-import SignupForm from 'components/auth/SignupForm';
+import SignupForm from 'components/form/SignupForm';
+import useScrollToError from 'components/hook/useScrollToError';
 import GeneralFlashMessage from 'containers/alert/GeneralFlashMessage';
 import { signUp } from 'actions/auth.action';
 
@@ -20,18 +20,8 @@ const styles = {
     }
 }
 
-const SignupPage = ({
-    values,
-    errors,
-    isSubmitting,
-    setFieldValue,
-    handleSubmit,
-}) => {
-
-    const handleSelectChange = function(selected) { 
-        setFieldValue(this.name, selected.value)
-    };
-
+const SignupPage = () => {
+    useScrollToError();
     return (
         <Grid container style={styles.root}>
             <Grid.Column style={{ maxWidth: 450 }}>
@@ -39,13 +29,7 @@ const SignupPage = ({
                     Sign-up for your account
                 </Header>
                 <GeneralFlashMessage event='SIGNUP' />
-                <SignupForm
-                    values={values}
-                    errors={errors}
-                    isSubmitting={isSubmitting}
-                    handleSelectChange={handleSelectChange}
-                    handleSubmit={handleSubmit}
-                />
+                <SignupForm />
                 <Message>
                     Already registered? &nbsp; <Link to='login'>Log in</Link>
                 </Message>
@@ -74,14 +58,6 @@ const SignupFormik = withFormik({
         signUp({ userData: values, setErrors, setSubmitting, resetForm});
     }
 });
-
-SignupPage.propTypes = {
-    values: PropTypes.object.isRequired,
-    errors: PropTypes.object.isRequired,
-    isSubmitting: PropTypes.bool.isRequired,
-    setFieldValue: PropTypes.func.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
-};
 
 export default compose(
     connect(null, { signUp }),

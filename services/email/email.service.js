@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer');
 const smtpTransport = nodemailer.createTransport({
     host: 'smtp.mailtrap.io',
     port: 2525,
-    tls: true,
+    // tls: true,
     // ssl: false,
     auth: {
       user: process.env.MAILTRAP_USERNAME,
@@ -24,7 +24,7 @@ var RegisterMailOptions = ({ host, user, token }) => ({
     text: `Hello, ${user.getFullname()}\n\n` + 
         'Congratulation! You have successfully registerd on Mern Ez Setup\n\n' +
         'In order to initialize your account, please click on the following link to show us this is your email:\n\n' +
-        `https://${host}/email_confirmation/${user.uid}/${token}\n\n` +
+        `http://${host}/email_confirmation/${user.uid}/${token}\n\n` +
         'If you did not request this, please ignore this email and your password will remain unchanged.\n'
 });
 
@@ -35,7 +35,7 @@ var ForgottenPwdMailOptions = ({ host, user, token }) => ({
     text: `Hello, ${user.getFullname()}\n\n` + 
         'You are receiving this because you have requested the reset of the password for your account.\n\n' +
         'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-        `https://${host}/resetpwd/${user.uid}/${token}\n\n` +
+        `http://${host}/resetpwd/${user.uid}/${token}\n\n` +
         'If you did not request this, please ignore this email and your password will remain unchanged.\n'
 });
 

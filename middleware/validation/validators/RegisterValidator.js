@@ -13,11 +13,12 @@ const {
     UNIQUE, 
     IS_STRING, 
     IS_ALPHA_NUM, 
-    MIN,
     IS_ALPHA_SPACE,
     STRONG_PWD,
+    MIN,
     SHUD_MATCH_WITH,
-    IS_IN
+    IS_IN,
+    DISALLOWED
 } = require('@utils/message.util');
 
 // Rule definition
@@ -64,6 +65,13 @@ const validations = [
         .exists({ checkFalsy: true }).withMessage(REQUIRED)
         .isString().withMessage(IS_STRING)
         .isIn(GENDER_OPTIONS).withMessage(IS_IN(GENDER_OPTIONS)),
+
+    // Security: prevent changing access control
+    check('role')
+        .not().exists().withMessage(DISALLOWED),
+    
+    check('is_email_confirmed')
+        .not().exists().withMessage(DISALLOWED),
 ]
 
 const RegisterValidator = Validator(validations);

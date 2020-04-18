@@ -2,14 +2,19 @@ import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Grid, Modal } from 'semantic-ui-react';
+import { Grid, Modal, Message } from 'semantic-ui-react';
 import { withFormik } from 'formik';
 import LoginForm from 'components/form/LoginForm';
 import GeneralFlashMessage from 'containers/alert/GeneralFlashMessage';
-import { login } from 'actions/auth.action';
+import { login, signOut } from 'actions/auth.action';
 
-const LoginPopup = ({ loginPopupOpen }) =>{
+const styles = {
+    message: {
+        textAlign: 'center'
+    }
+}
 
+const LoginPopup = ({ loginPopupOpen, signOut }) =>{
     return (
         <Modal open={loginPopupOpen} dimmer='blurring' size='tiny' closeOnEscape={false} closeOnDimmerClick={false} >
             <Modal.Header>Session Expired</Modal.Header>
@@ -18,6 +23,9 @@ const LoginPopup = ({ loginPopupOpen }) =>{
                     <p>Please enter your credentials for session renewal</p>
                     <GeneralFlashMessage event='LOGIN' />
                     <LoginForm />
+                    <Message style={styles.message}>
+                        Want to leave? &nbsp; <a href='#logout' onClick={signOut} >Logout</a>
+                    </Message>
                 </Grid.Column>
             </Modal.Content>
         </Modal>
@@ -45,9 +53,10 @@ const mapStateToProps = state => ({
 
 LoginPopup.propTypes = {
     loginPopupOpen: PropTypes.bool.isRequired,
+    signOut: PropTypes.func.isRequired,
 };
 
 export default compose(
-    connect(mapStateToProps, { login }),
+    connect(mapStateToProps, { login, signOut }),
     LoginPopupFormik
 )(LoginPopup);

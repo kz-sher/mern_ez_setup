@@ -1,10 +1,8 @@
-import store from 'config/store';
 import history from 'config/history';
 import authaxios from 'routes/authaxios';
 import EventEmitter from 'utils/EventEmitter';
 import { setAuthHeader } from 'utils/auth.util';
 import { translateErrorToMsg } from 'utils/general.util'
-import { initDone } from './init.action';
 import { closeLoginPopup } from './view.action';
 import { SIGN_IN, SIGN_OUT } from './types';
 
@@ -120,21 +118,6 @@ export const confirmEmail = (params) => {
     }
 }
 
-export const initUserState = () => {
-    return dispatch => {
-        const isUserAuthenticated = store.getState().auth.isAuthenticated;
-        if(!isUserAuthenticated){
-            authaxios.renewToken().then(
-                ({ data: { accessToken } }) => {
-                    setAuthHeader(accessToken);
-                    dispatch(signIn(accessToken));
-                    dispatch(initDone());
-                },
-                () => { dispatch(initDone()) },
-            );
-        }
-    }
-}
 
 export const signIn = token => {
     return dispatch => {
@@ -147,6 +130,7 @@ export const signOut = () => {
         authaxios.logout().then(() => {
             history.push('/');
             dispatch({ type: SIGN_OUT });
+            dispatch(closeLoginPopup());
         })
     }
 }

@@ -2,7 +2,7 @@ import { SIGN_IN, SIGN_OUT } from 'actions/types';
 
 const DEFAULT_STATE = {
     isAuthenticated: false,
-    token: '', 
+    token: '',
 };
 
 export default (state = DEFAULT_STATE, action) => {

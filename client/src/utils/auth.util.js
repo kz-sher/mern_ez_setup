@@ -1,4 +1,9 @@
-import axios from "axios";
+import axios from 'axios';
+import store from 'config/store';
+
+export const isUserAuthenticated = () => {
+   return store.getState().auth.isAuthenticated;
+}
 
 export const setAuthHeader = token => {
    if (token) {

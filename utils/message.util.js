@@ -22,6 +22,7 @@ const message = {
     UNIQUE: '* is already taken',
     EXISTS: '* not found',
     BLACK_TOKEN: 'Token is in blacklist',
+    DISALLOWED: '* is not allowed',
     MIN,
     IS_IN,
     SHUD_MATCH_WITH,

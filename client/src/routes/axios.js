@@ -1,6 +1,6 @@
 import axios from 'axios';
 import store from 'config/store';
-import { setAuthHeader } from 'utils/auth.util';
+import { setAuthHeader, isUserAuthenticated } from 'utils/auth.util';
 import { signIn } from 'actions/auth.action';
 import { openLoginPopup } from 'actions/view.action';
 
@@ -45,8 +45,7 @@ axios.interceptors.response.use(
                         },
                         () => {
                             // if user is previously authenticated
-                            const isUserAuthenticated = store.getState().auth.isAuthenticated;
-                            if(isUserAuthenticated){
+                            if(isUserAuthenticated()){
                                 // prompt user to login by showing popup
                                 store.dispatch(openLoginPopup());
                             }

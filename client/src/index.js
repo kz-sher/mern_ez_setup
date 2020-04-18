@@ -7,7 +7,7 @@ import 'semantic-ui-css/semantic.min.css';
 
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react'
-import { initUserState } from './actions/auth.action';
+import { initUserState } from './actions/init.action';
 import store from './config/store';
 
 // Create persistent store

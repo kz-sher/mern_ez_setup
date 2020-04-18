@@ -45,10 +45,12 @@ const UserSchema = new Schema({
     },
     role: {
         type: String,
-        default: 'User',
+        enum: ['user', 'admin'],
+        default: 'user',
     },
     is_email_confirmed: {
         type: Boolean,
+        enum: [true, false],
         default: false
     },
     created_at: {

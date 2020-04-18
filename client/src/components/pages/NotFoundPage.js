@@ -8,7 +8,7 @@ const styles = {
     }
 }
 
-const NotFound = () => {
+const NotFoundPage = () => {
     return (
         <Segment style={styles.root} vertical>
             <Grid container>
@@ -28,4 +28,4 @@ const NotFound = () => {
     )
 }
 
-export default NotFound;
+export default NotFoundPage;

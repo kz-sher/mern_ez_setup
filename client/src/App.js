@@ -5,16 +5,16 @@ import OnlyIf from './components/utils/OnlyIf';
 import PublicRoute from './containers/route/PublicRoute';
 import GuestRoute from './containers/route/GuestRoute';
 import UserRoute from './containers/route/UserRoute';
-import NotFound from './components/layout/NotFound';
-import HomePage from './components/layout/HomePage';
+import NotFound from './components/pages/NotFoundPage';
+import HomePage from './components/pages/HomePage';
 import EmailConfirmation from './containers/mitm/EmailConfirmation';
-import DashboardPage from './containers/DashboardPage';
-import ProductPage from './containers/ProductPage';
-import LoginPage from './containers/auth/LoginPage';
-import SignupPage from './containers/auth/SignupPage';
-import ForgotPwdPage from './containers/auth/ForgotPwdPage';
-import ResetPwdPage from './containers/auth/ResetPwdPage';
-import LoginPopup from './containers/auth/LoginPopup';
+import DashboardPage from './containers/pages/DashboardPage';
+import ProductPage from './containers/pages/ProductPage';
+import LoginPage from './containers/pages/LoginPage';
+import SignupPage from './containers/pages/SignupPage';
+import ForgotPwdPage from './containers/pages/ForgotPwdPage';
+import ResetPwdPage from './containers/pages/ResetPwdPage';
+import LoginPopup from './containers/pages/LoginPopup';
 import history from './config/history';
 
 const App = ({ isUserInitialized }) => {

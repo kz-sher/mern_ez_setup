@@ -14,7 +14,7 @@ import LoginPage from './containers/pages/LoginPage';
 import SignupPage from './containers/pages/SignupPage';
 import ForgotPwdPage from './containers/pages/ForgotPwdPage';
 import ResetPwdPage from './containers/pages/ResetPwdPage';
-import LoginPopup from './containers/pages/LoginPopup';
+import LoginPopup from './containers/modal/LoginPopup';
 import history from './config/history';
 
 const App = ({ isUserInitialized }) => {

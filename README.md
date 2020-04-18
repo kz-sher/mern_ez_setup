@@ -56,7 +56,7 @@ git clone <repo-link>
 2. Navigate to the root level of project folder and enter the following command to install all npm packages required:
 
 ```bash
-npm run install
+npm run install-all
 ```
 
 3. To run the project, you would need to have your environment variables set up in `.env`. For more info, go to [Environment Variables](#environment-variables). After it is done, you can execute the command below:
